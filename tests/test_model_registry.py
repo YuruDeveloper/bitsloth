@@ -13,15 +13,15 @@ from dataclasses import dataclass
 import pytest
 from huggingface_hub import ModelInfo as HfModelInfo
 
-from unsloth.registry import register_models, search_models
-from unsloth.registry._deepseek import register_deepseek_models
-from unsloth.registry._gemma import register_gemma_models
-from unsloth.registry._llama import register_llama_models
-from unsloth.registry._mistral import register_mistral_models
-from unsloth.registry._phi import register_phi_models
-from unsloth.registry._qwen import register_qwen_models
-from unsloth.registry.registry import MODEL_REGISTRY, QUANT_TAG_MAP, QuantType
-from unsloth.utils.hf_hub import get_model_info
+from bitsloth.registry import register_models, search_models
+from bitsloth.registry._deepseek import register_deepseek_models
+from bitsloth.registry._gemma import register_gemma_models
+from bitsloth.registry._llama import register_llama_models
+from bitsloth.registry._mistral import register_mistral_models
+from bitsloth.registry._phi import register_phi_models
+from bitsloth.registry._qwen import register_qwen_models
+from bitsloth.registry.registry import MODEL_REGISTRY, QUANT_TAG_MAP, QuantType
+from bitsloth.utils.hf_hub import get_model_info
 
 MODEL_NAMES = [
     "llama",
@@ -85,8 +85,8 @@ def test_all_model_registration():
 
 def test_quant_type():
     # Test that the quant_type is correctly set for model paths
-    # NOTE: for models registered under org="unsloth" with QuantType.NONE aliases QuantType.UNSLOTH
-    dynamic_quant_models = search_models(quant_types = [QuantType.UNSLOTH])
-    assert all(m.quant_type == QuantType.UNSLOTH for m in dynamic_quant_models)
-    quant_tag = QUANT_TAG_MAP[QuantType.UNSLOTH]
+    # NOTE: for models registered under org="bitsloth" with QuantType.NONE aliases QuantType.BITSLOTH
+    dynamic_quant_models = search_models(quant_types = [QuantType.BITSLOTH])
+    assert all(m.quant_type == QuantType.BITSLOTH for m in dynamic_quant_models)
+    quant_tag = QUANT_TAG_MAP[QuantType.BITSLOTH]
     assert all(quant_tag in m.model_path for m in dynamic_quant_models)

@@ -1,4 +1,4 @@
-# Copyright 2023-present Daniel Han-Chen, Michael Han-Chen & the Unsloth team. All rights reserved.
+# Copyright 2023-present Daniel Han-Chen, Michael Han-Chen & the Bitsloth team. All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from unsloth import FastLanguageModel
-from unsloth.utils import attention_dispatch as attention_dispatch_utils
-from unsloth.utils.packing import (
+from bitsloth import FastLanguageModel
+from bitsloth.utils import attention_dispatch as attention_dispatch_utils
+from bitsloth.utils.packing import (
     configure_padding_free,
     configure_sample_packing,
     enable_padding_free_metadata,
@@ -98,7 +98,7 @@ def _build_packed_training_setup(tmp_path, device):
         if torch.is_tensor(value):
             batch[key] = value.to(model_device)
 
-    from unsloth.models import llama as llama_mod
+    from bitsloth.models import llama as llama_mod
 
     return model, batch, trainer, llama_mod
 
@@ -224,12 +224,12 @@ def test_enable_sample_packing():
     enable_sample_packing(model, trainer)
 
     # model hierarchy should now allow packed overlength inputs
-    assert getattr(model, "_unsloth_allow_packed_overlength") is True
-    assert getattr(model.child, "_unsloth_allow_packed_overlength") is True
+    assert getattr(model, "_bitsloth_allow_packed_overlength") is True
+    assert getattr(model.child, "_bitsloth_allow_packed_overlength") is True
 
     collator = trainer.data_collator
     assert collator.return_position_ids is True
-    assert getattr(collator, "_unsloth_packing_wrapped") is True
+    assert getattr(collator, "_bitsloth_packing_wrapped") is True
 
     examples = [
         {
@@ -300,12 +300,12 @@ def test_enable_padding_free_metadata():
 
     enable_padding_free_metadata(model, trainer)
 
-    assert getattr(model, "_unsloth_allow_packed_overlength") is True
-    assert getattr(model.child, "_unsloth_allow_packed_overlength") is True
+    assert getattr(model, "_bitsloth_allow_packed_overlength") is True
+    assert getattr(model.child, "_bitsloth_allow_packed_overlength") is True
 
     collator = trainer.data_collator
     assert collator.return_position_ids is True
-    assert getattr(collator, "_unsloth_padding_free_lengths_wrapped") is True
+    assert getattr(collator, "_bitsloth_padding_free_lengths_wrapped") is True
 
     examples = [
         {"input_ids": [0, 1, 2]},

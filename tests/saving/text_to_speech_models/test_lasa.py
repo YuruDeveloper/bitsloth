@@ -1,4 +1,4 @@
-from unsloth import FastLanguageModel, FastModel
+from bitsloth import FastLanguageModel, FastModel
 from transformers import CsmForConditionalGeneration
 import torch
 
@@ -42,7 +42,7 @@ print(f"{'='*80}")
 
 max_seq_length = 2048
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = "unsloth/Llasa-1B",
+    model_name = unsloth/Llasa-1B",
     max_seq_length = max_seq_length,
     dtype = None,  # Select None for auto detection
     load_in_4bit = False,  # Choose True for 4bit which reduces memory
@@ -59,8 +59,8 @@ model = FastLanguageModel.get_peft_model(
     lora_alpha = 128,
     lora_dropout = 0,  # Supports any, but = 0 is optimized
     bias = "none",  # Supports any, but = "none" is optimized
-    # [NEW] "unsloth" uses 30% less VRAM, fits 2x larger batch sizes!
-    use_gradient_checkpointing = "unsloth",  # True or "unsloth" for very long context
+    # [NEW] "bitsloth" uses 30% less VRAM, fits 2x larger batch sizes!
+    use_gradient_checkpointing = "bitsloth",  # True or "bitsloth" for very long context
     random_state = 3407,
     use_rslora = False,  # We support rank stabilized LoRA
     loftq_config = None,  # And LoftQ
@@ -125,7 +125,7 @@ model, tokenizer = FastLanguageModel.from_pretrained(
 )
 
 # from transformers import AutoProcessor
-# processor = AutoProcessor.from_pretrained("unsloth/csm-1b")
+# processor = AutoProcessor.from_pretrained(unsloth/csm-1b")
 
 print("✅ Model loaded for inference successfully!")
 
@@ -216,5 +216,5 @@ except Exception as e:
 print("✅ All sections passed successfully!")
 
 
-safe_remove_directory("./unsloth_compiled_cache")
+safe_remove_directory("./bitsloth_compiled_cache")
 safe_remove_directory("./lasa")

@@ -40,10 +40,10 @@ datasets_mock = type(sys)("datasets")
 datasets_mock.Dataset = MockDataset
 sys.modules["datasets"] = datasets_mock
 
-# Import the raw_text module directly to avoid unsloth/__init__.py dependencies
+# Import the raw_text module directly to avoid bitsloth/__init__.py dependencies
 current_dir = os.path.dirname(__file__)
 raw_text_path = os.path.join(
-    os.path.dirname(current_dir), "unsloth", "dataprep", "raw_text.py"
+    os.path.dirname(current_dir), "bitsloth", "dataprep", "raw_text.py"
 )
 
 spec = importlib.util.spec_from_file_location("raw_text", raw_text_path)

@@ -1,5 +1,5 @@
-from unsloth import FastLanguageModel, FastVisionModel, UnslothVisionDataCollator
-from unsloth.chat_templates import get_chat_template
+from bitsloth import FastLanguageModel, FastVisionModel, BitslothVisionDataCollator
+from bitsloth.chat_templates import get_chat_template
 from trl import SFTTrainer, SFTConfig
 from transformers import (
     DataCollatorForLanguageModeling,
@@ -32,12 +32,12 @@ from tests.utils.perplexity_eval import (
 
 def load_and_compute_8bit_ppl(result_queue, load_in_4bit = False, load_in_8bit = False):
     """Load model and compute perplexity in subprocess"""
-    from unsloth import FastLanguageModel
+    from bitsloth import FastLanguageModel
     from tests.utils.perplexity_eval import ppl_model
 
     # Load model
     merged_model, merged_tokenizer = FastLanguageModel.from_pretrained(
-        model_name = "./unsloth_out/merged_mistral_text_model",
+        model_name = "./bitsloth_out/merged_mistral_text_model",
         max_seq_length = 2048,
         load_in_4bit = load_in_4bit,
         load_in_8bit = load_in_8bit,
@@ -139,7 +139,7 @@ if __name__ == "__main__":
         attn_implementation = "sdpa"
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name = "unsloth/mistral-7b-v0.3",
+        model_name = unsloth/mistral-7b-v0.3",
         max_seq_length = 2048,
         dtype = compute_dtype,
         load_in_4bit = True,
@@ -226,13 +226,13 @@ if __name__ == "__main__":
         lora_alpha = 16,
         lora_dropout = 0,
         bias = "none",
-        use_gradient_checkpointing = "unsloth",
+        use_gradient_checkpointing = "bitsloth",
         random_state = 3407,
         use_rslora = False,
         loftq_config = None,
     )
 
-    from unsloth import is_bfloat16_supported
+    from bitsloth import is_bfloat16_supported
 
     trainer = SFTTrainer(
         model = model,
@@ -267,7 +267,7 @@ if __name__ == "__main__":
     # saving and merging the model to local disk
     print("merge and save to local disk")
     model.save_pretrained_merged(
-        save_directory = "./unsloth_out/merged_mistral_text_model", tokenizer = tokenizer
+        save_directory = "./bitsloth_out/merged_mistral_text_model", tokenizer = tokenizer
     )
 
     # print("cleaning")
@@ -279,7 +279,7 @@ if __name__ == "__main__":
     # load model from local disk and test
     print("Loading merged model in 4 bit for perplexity test")
     merged_model, merged_tokenizer = FastLanguageModel.from_pretrained(
-        model_name = "./unsloth_out/merged_mistral_text_model",
+        model_name = "./bitsloth_out/merged_mistral_text_model",
         max_seq_length = 2048,
         load_in_4bit = True,
         load_in_8bit = False,
@@ -300,7 +300,7 @@ if __name__ == "__main__":
 
     print("Loading merged model in 16 bit for perplexity test")
     merged_model, merged_tokenizer = FastLanguageModel.from_pretrained(
-        model_name = "./unsloth_out/merged_mistral_text_model",
+        model_name = "./bitsloth_out/merged_mistral_text_model",
         max_seq_length = 2048,
         load_in_4bit = False,
         load_in_8bit = False,
@@ -314,5 +314,5 @@ if __name__ == "__main__":
     print_model_comparison()
 
     safe_remove_directory("./outputs")
-    safe_remove_directory("./unsloth_compiled_cache")
-    safe_remove_directory("./unsloth_out")
+    safe_remove_directory("./bitsloth_compiled_cache")
+    safe_remove_directory("./bitsloth_out")

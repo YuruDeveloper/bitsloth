@@ -1,5 +1,5 @@
 # inference_on_merged.py
-from unsloth import FastLanguageModel
+from bitsloth import FastLanguageModel
 from transformers import TextStreamer
 import torch
 import gc
@@ -55,6 +55,6 @@ gc.collect()
 
 safe_remove_directory("./gpt-oss-finetuned-merged")
 safe_remove_directory(
-    "./unsloth_compiled_cache"
+    "./bitsloth_compiled_cache"
 )  # Clean up cache created by this process
 print("✅ Final cleanup complete. Exiting inference script.")

@@ -335,7 +335,7 @@ def test_validate_prebuilt_choice_creates_repo_shaped_linux_install(
     assert (install_dir / "build" / "bin" / "libllama.so").exists()
     assert (install_dir / "llama-server").exists()
     assert (install_dir / "llama-quantize").exists()
-    assert (install_dir / "UNSLOTH_PREBUILT_INFO.json").exists()
+    assert (install_dir / "BITSLOTH_PREBUILT_INFO.json").exists()
     assert (install_dir / "BUILD_INFO.txt").exists()
 
 
@@ -452,7 +452,7 @@ def test_validate_prebuilt_choice_creates_repo_shaped_windows_install(
     assert (install_dir / "build" / "bin" / "Release" / "llama-quantize.exe").exists()
     assert (install_dir / "build" / "bin" / "Release" / "llama.dll").exists()
     assert not (install_dir / "llama-server.exe").exists()
-    assert (install_dir / "UNSLOTH_PREBUILT_INFO.json").exists()
+    assert (install_dir / "BITSLOTH_PREBUILT_INFO.json").exists()
     assert (install_dir / "BUILD_INFO.txt").exists()
 
 

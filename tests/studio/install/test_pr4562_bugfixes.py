@@ -6,7 +6,7 @@ Tests cover:
   - Bug 2: Source-build fallback ignores pinned tag (both .sh and .ps1)
   - Bug 3: Unix fallback deletes install before checking prerequisites
   - Bug 4: Linux LD_LIBRARY_PATH missing build/bin
-  - "latest" tag resolution fallback chain (Unsloth -> ggml-org -> raw)
+  - "latest" tag resolution fallback chain (Bitsloth -> ggml-org -> raw)
   - Cross-platform binary_env (Linux, macOS, Windows)
   - Edge cases: malformed JSON, empty responses, env overrides
 
@@ -51,19 +51,19 @@ SETUP_PS1 = PACKAGE_ROOT / "studio" / "setup.ps1"
 def make_host(*, system: str) -> HostInfo:
     """Create a HostInfo for the given OS."""
     return HostInfo(
-        system = system,
-        machine = "x86_64" if system != "Darwin" else "arm64",
-        is_windows = (system == "Windows"),
-        is_linux = (system == "Linux"),
-        is_macos = (system == "Darwin"),
-        is_x86_64 = (system != "Darwin"),
-        is_arm64 = (system == "Darwin"),
-        nvidia_smi = None,
-        driver_cuda_version = None,
-        compute_caps = [],
-        visible_cuda_devices = None,
-        has_physical_nvidia = False,
-        has_usable_nvidia = False,
+        system=system,
+        machine="x86_64" if system != "Darwin" else "arm64",
+        is_windows=(system == "Windows"),
+        is_linux=(system == "Linux"),
+        is_macos=(system == "Darwin"),
+        is_x86_64=(system != "Darwin"),
+        is_arm64=(system == "Darwin"),
+        nvidia_smi=None,
+        driver_cuda_version=None,
+        compute_caps=[],
+        visible_cuda_devices=None,
+        has_physical_nvidia=False,
+        has_usable_nvidia=False,
     )
 
 
@@ -77,10 +77,10 @@ def run_bash(script: str, *, timeout: int = 10, env: dict | None = None) -> str:
         run_env.update(env)
     result = subprocess.run(
         [BASH, "-c", script],
-        capture_output = True,
-        text = True,
-        timeout = timeout,
-        env = run_env,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        env=run_env,
     )
     return result.stdout.strip()
 
@@ -96,19 +96,19 @@ class TestBinaryEnvCrossPlatform:
     ):
         install_dir = tmp_path / "llama.cpp"
         bin_dir = install_dir / "build" / "bin"
-        bin_dir.mkdir(parents = True)
+        bin_dir.mkdir(parents=True)
         binary_path = bin_dir / "llama-server"
         binary_path.write_bytes(b"fake")
 
-        host = make_host(system = "Linux")
+        host = make_host(system="Linux")
         monkeypatch.setattr(MOD, "linux_runtime_dirs", lambda _bp: [])
 
         env = binary_env(binary_path, install_dir, host)
         ld_dirs = env["LD_LIBRARY_PATH"].split(os.pathsep)
         assert str(bin_dir) in ld_dirs, f"build/bin not in LD_LIBRARY_PATH: {ld_dirs}"
-        assert (
-            str(install_dir) in ld_dirs
-        ), f"install_dir not in LD_LIBRARY_PATH: {ld_dirs}"
+        assert str(install_dir) in ld_dirs, (
+            f"install_dir not in LD_LIBRARY_PATH: {ld_dirs}"
+        )
 
     def test_linux_binary_parent_comes_before_install_dir(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -116,31 +116,31 @@ class TestBinaryEnvCrossPlatform:
         """build/bin should be searched before install_dir for .so files."""
         install_dir = tmp_path / "llama.cpp"
         bin_dir = install_dir / "build" / "bin"
-        bin_dir.mkdir(parents = True)
+        bin_dir.mkdir(parents=True)
         binary_path = bin_dir / "llama-server"
         binary_path.write_bytes(b"fake")
 
-        host = make_host(system = "Linux")
+        host = make_host(system="Linux")
         monkeypatch.setattr(MOD, "linux_runtime_dirs", lambda _bp: [])
 
         env = binary_env(binary_path, install_dir, host)
         ld_dirs = env["LD_LIBRARY_PATH"].split(os.pathsep)
         bin_idx = ld_dirs.index(str(bin_dir))
         install_idx = ld_dirs.index(str(install_dir))
-        assert (
-            bin_idx < install_idx
-        ), "binary_path.parent should come before install_dir"
+        assert bin_idx < install_idx, (
+            "binary_path.parent should come before install_dir"
+        )
 
     def test_linux_deduplicates_when_binary_parent_equals_install_dir(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ):
         """When binary is directly in install_dir, no duplicate entries."""
         install_dir = tmp_path / "llama.cpp"
-        install_dir.mkdir(parents = True)
+        install_dir.mkdir(parents=True)
         binary_path = install_dir / "llama-server"
         binary_path.write_bytes(b"fake")
 
-        host = make_host(system = "Linux")
+        host = make_host(system="Linux")
         monkeypatch.setattr(MOD, "linux_runtime_dirs", lambda _bp: [])
 
         env = binary_env(binary_path, install_dir, host)
@@ -153,7 +153,7 @@ class TestBinaryEnvCrossPlatform:
     ):
         install_dir = tmp_path / "llama.cpp"
         bin_dir = install_dir / "build" / "bin"
-        bin_dir.mkdir(parents = True)
+        bin_dir.mkdir(parents=True)
         binary_path = bin_dir / "llama-server"
         binary_path.write_bytes(b"fake")
 
@@ -163,7 +163,7 @@ class TestBinaryEnvCrossPlatform:
         custom_lib.mkdir()
         other_lib.mkdir()
 
-        host = make_host(system = "Linux")
+        host = make_host(system="Linux")
         monkeypatch.setattr(MOD, "linux_runtime_dirs", lambda _bp: [])
         original = os.environ.get("LD_LIBRARY_PATH", "")
         os.environ["LD_LIBRARY_PATH"] = f"{custom_lib}:{other_lib}"
@@ -183,11 +183,11 @@ class TestBinaryEnvCrossPlatform:
     ):
         install_dir = tmp_path / "llama.cpp"
         bin_dir = install_dir / "build" / "bin" / "Release"
-        bin_dir.mkdir(parents = True)
+        bin_dir.mkdir(parents=True)
         binary_path = bin_dir / "llama-server.exe"
         binary_path.write_bytes(b"MZ")
 
-        host = make_host(system = "Windows")
+        host = make_host(system="Windows")
         monkeypatch.setattr(
             MOD, "windows_runtime_dirs_for_runtime_line", lambda _rt: []
         )
@@ -200,23 +200,23 @@ class TestBinaryEnvCrossPlatform:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ):
         install_dir = tmp_path / "llama.cpp"
-        install_dir.mkdir(parents = True)
+        install_dir.mkdir(parents=True)
         bin_dir = install_dir / "build" / "bin"
         binary_path = bin_dir / "llama-server"
-        binary_path.parent.mkdir(parents = True)
+        binary_path.parent.mkdir(parents=True)
         binary_path.write_bytes(b"fake")
 
-        host = make_host(system = "Darwin")
-        monkeypatch.delenv("DYLD_LIBRARY_PATH", raising = False)
+        host = make_host(system="Darwin")
+        monkeypatch.delenv("DYLD_LIBRARY_PATH", raising=False)
 
         env = binary_env(binary_path, install_dir, host)
         dyld_parts = [p for p in env["DYLD_LIBRARY_PATH"].split(os.pathsep) if p]
-        assert (
-            str(bin_dir) in dyld_parts
-        ), f"build/bin not in DYLD_LIBRARY_PATH: {dyld_parts}"
-        assert (
-            str(install_dir) in dyld_parts
-        ), f"install_dir not in DYLD_LIBRARY_PATH: {dyld_parts}"
+        assert str(bin_dir) in dyld_parts, (
+            f"build/bin not in DYLD_LIBRARY_PATH: {dyld_parts}"
+        )
+        assert str(install_dir) in dyld_parts, (
+            f"install_dir not in DYLD_LIBRARY_PATH: {dyld_parts}"
+        )
         # binary_path.parent (build/bin) should come before install_dir
         assert dyld_parts.index(str(bin_dir)) < dyld_parts.index(str(install_dir))
 
@@ -277,7 +277,7 @@ class TestSetupShLogic:
                 echo "would_clone"
             fi
         """)
-        output = run_bash(script, env = {"PATH": ":".join(safe_dirs)})
+        output = run_bash(script, env={"PATH": ":".join(safe_dirs)})
         assert "cmake_missing" in output
         assert marker.exists(), "Install dir was deleted despite cmake missing!"
 
@@ -311,7 +311,7 @@ class TestSetupShLogic:
                 echo "would_clone"
             fi
         """)
-        output = run_bash(script, env = {"PATH": ":".join(safe_dirs)})
+        output = run_bash(script, env={"PATH": ":".join(safe_dirs)})
         assert "git_missing" in output
         assert marker.exists(), "Install dir was deleted despite git missing!"
 
@@ -382,14 +382,14 @@ class TestSetupShLogic:
                 if [ $? -ne 0 ]; then
                     echo "WARN: fetch failed"
                 else
-                    git -C "$LlamaCppDir" checkout -B unsloth-llama-build FETCH_HEAD
+                    git -C "$LlamaCppDir" checkout -B bitsloth-llama-build FETCH_HEAD
                 fi
             fi
         """)
         run_bash(script)
         log = log_file.read_text()
         assert "fetch --depth 1 origin b8508" in log
-        assert "checkout -B unsloth-llama-build FETCH_HEAD" in log
+        assert "checkout -B bitsloth-llama-build FETCH_HEAD" in log
         assert "pull" not in log, "Should use fetch, not pull"
 
     def test_fetch_failure_warns_not_aborts(self, tmp_path: Path):
@@ -415,7 +415,7 @@ class TestSetupShLogic:
                 if [ $? -ne 0 ]; then
                     echo "WARN: fetch failed -- using existing source"
                 else
-                    git -C "$LlamaCppDir" checkout -B unsloth-llama-build FETCH_HEAD
+                    git -C "$LlamaCppDir" checkout -B bitsloth-llama-build FETCH_HEAD
                 fi
             fi
             echo "BuildOk=$BuildOk"
@@ -429,7 +429,7 @@ class TestSetupShLogic:
 # TEST GROUP D: "latest" tag resolution (bash subprocess)
 # =========================================================================
 class TestLatestTagResolution:
-    """Test the fallback chain: Unsloth API -> ggml-org API -> raw."""
+    """Test the fallback chain: Bitsloth API -> ggml-org API -> raw."""
 
     RESOLVE_TEMPLATE = textwrap.dedent("""\
         export PATH="{mock_bin}:$PATH"
@@ -453,13 +453,13 @@ class TestLatestTagResolution:
 
     @staticmethod
     def _make_curl_mock(
-        mock_bin: Path, unsloth_response: str | None, ggml_response: str | None
+        mock_bin: Path, bitsloth_response: str | None, ggml_response: str | None
     ):
         """Create a curl mock that returns different responses per repo."""
         lines = ["#!/bin/bash"]
-        if unsloth_response is not None:
+        if bitsloth_response is not None:
             lines.append(
-                f'if echo "$*" | grep -q "unslothai/llama.cpp"; then echo \'{unsloth_response}\'; exit 0; fi'
+                f'if echo "$*" | grep -q "unslothai/llama.cpp"; then echo \'{bitsloth_response}\'; exit 0; fi'
             )
         else:
             lines.append(
@@ -480,32 +480,32 @@ class TestLatestTagResolution:
         self,
         tmp_path: Path,
         requested_tag: str,
-        unsloth_resp: str | None,
+        bitsloth_resp: str | None,
         ggml_resp: str | None,
     ) -> str:
         mock_bin = tmp_path / "mock_bin"
-        mock_bin.mkdir(exist_ok = True)
-        self._make_curl_mock(mock_bin, unsloth_resp, ggml_resp)
+        mock_bin.mkdir(exist_ok=True)
+        self._make_curl_mock(mock_bin, bitsloth_resp, ggml_resp)
         script = self.RESOLVE_TEMPLATE.format(
-            mock_bin = mock_bin, requested_tag = requested_tag
+            mock_bin=mock_bin, requested_tag=requested_tag
         )
         return run_bash(script)
 
-    def test_unsloth_succeeds(self, tmp_path: Path):
+    def test_bitsloth_succeeds(self, tmp_path: Path):
         output = self._run_resolve(
             tmp_path,
             "latest",
-            unsloth_resp = '{"tag_name":"b8508"}',
-            ggml_resp = '{"tag_name":"b9000"}',
+            bitsloth_resp='{"tag_name":"b8508"}',
+            ggml_resp='{"tag_name":"b9000"}',
         )
         assert output == "b8508"
 
-    def test_unsloth_fails_ggml_succeeds(self, tmp_path: Path):
+    def test_bitsloth_fails_ggml_succeeds(self, tmp_path: Path):
         output = self._run_resolve(
             tmp_path,
             "latest",
-            unsloth_resp = None,
-            ggml_resp = '{"tag_name":"b9000"}',
+            bitsloth_resp=None,
+            ggml_resp='{"tag_name":"b9000"}',
         )
         assert output == "b9000"
 
@@ -513,8 +513,8 @@ class TestLatestTagResolution:
         output = self._run_resolve(
             tmp_path,
             "latest",
-            unsloth_resp = None,
-            ggml_resp = None,
+            bitsloth_resp=None,
+            ggml_resp=None,
         )
         assert output == "latest"
 
@@ -522,17 +522,17 @@ class TestLatestTagResolution:
         output = self._run_resolve(
             tmp_path,
             "b7777",
-            unsloth_resp = '{"tag_name":"b8508"}',
-            ggml_resp = '{"tag_name":"b9000"}',
+            bitsloth_resp='{"tag_name":"b8508"}',
+            ggml_resp='{"tag_name":"b9000"}',
         )
         assert output == "b7777"
 
-    def test_unsloth_malformed_json_falls_through(self, tmp_path: Path):
+    def test_bitsloth_malformed_json_falls_through(self, tmp_path: Path):
         output = self._run_resolve(
             tmp_path,
             "latest",
-            unsloth_resp = '{"bad_key":"no_tag"}',
-            ggml_resp = '{"tag_name":"b9001"}',
+            bitsloth_resp='{"bad_key":"no_tag"}',
+            ggml_resp='{"tag_name":"b9001"}',
         )
         assert output == "b9001"
 
@@ -540,46 +540,46 @@ class TestLatestTagResolution:
         output = self._run_resolve(
             tmp_path,
             "latest",
-            unsloth_resp = '{"bad":"data"}',
-            ggml_resp = '{"also":"bad"}',
+            bitsloth_resp='{"bad":"data"}',
+            ggml_resp='{"also":"bad"}',
         )
         assert output == "latest"
 
-    def test_unsloth_empty_body_falls_through(self, tmp_path: Path):
+    def test_bitsloth_empty_body_falls_through(self, tmp_path: Path):
         output = self._run_resolve(
             tmp_path,
             "latest",
-            unsloth_resp = "",
-            ggml_resp = '{"tag_name":"b7000"}',
+            bitsloth_resp="",
+            ggml_resp='{"tag_name":"b7000"}',
         )
         assert output == "b7000"
 
-    def test_unsloth_empty_tag_name_falls_through(self, tmp_path: Path):
+    def test_bitsloth_empty_tag_name_falls_through(self, tmp_path: Path):
         output = self._run_resolve(
             tmp_path,
             "latest",
-            unsloth_resp = '{"tag_name":""}',
-            ggml_resp = '{"tag_name":"b6000"}',
+            bitsloth_resp='{"tag_name":""}',
+            ggml_resp='{"tag_name":"b6000"}',
         )
         assert output == "b6000"
 
-    def test_env_override_unsloth_llama_tag(self):
+    def test_env_override_bitsloth_llama_tag(self):
         output = run_bash(
-            'echo "${UNSLOTH_LLAMA_TAG:-latest}"',
-            env = {"UNSLOTH_LLAMA_TAG": "b1234"},
+            'echo "${BITSLOTH_LLAMA_TAG:-latest}"',
+            env={"BITSLOTH_LLAMA_TAG": "b1234"},
         )
         assert output == "b1234"
 
     def test_env_unset_defaults_to_latest(self):
         env = os.environ.copy()
-        env.pop("UNSLOTH_LLAMA_TAG", None)
-        output = run_bash('echo "${UNSLOTH_LLAMA_TAG:-latest}"', env = env)
+        env.pop("BITSLOTH_LLAMA_TAG", None)
+        output = run_bash('echo "${BITSLOTH_LLAMA_TAG:-latest}"', env=env)
         assert output == "latest"
 
     def test_env_empty_defaults_to_latest(self):
         output = run_bash(
-            'echo "${UNSLOTH_LLAMA_TAG:-latest}"',
-            env = {"UNSLOTH_LLAMA_TAG": ""},
+            'echo "${BITSLOTH_LLAMA_TAG:-latest}"',
+            env={"BITSLOTH_LLAMA_TAG": ""},
         )
         assert output == "latest"
 
@@ -608,30 +608,30 @@ class TestSourceCodePatterns:
         """git clone in source-build should use --branch via _CLONE_BRANCH_ARGS."""
         content = SETUP_SH.read_text()
         # The clone line should use _CLONE_BRANCH_ARGS (which conditionally includes --branch)
-        assert (
-            "_CLONE_BRANCH_ARGS" in content
-        ), "Clone should use _CLONE_BRANCH_ARGS array"
-        assert (
-            '--branch "$_RESOLVED_LLAMA_TAG"' in content
-        ), "_CLONE_BRANCH_ARGS should be set to --branch $_RESOLVED_LLAMA_TAG"
+        assert "_CLONE_BRANCH_ARGS" in content, (
+            "Clone should use _CLONE_BRANCH_ARGS array"
+        )
+        assert '--branch "$_RESOLVED_LLAMA_TAG"' in content, (
+            "_CLONE_BRANCH_ARGS should be set to --branch $_RESOLVED_LLAMA_TAG"
+        )
         # Verify the guard: --branch is only used when tag is not "latest"
-        assert (
-            '_RESOLVED_LLAMA_TAG" != "latest"' in content
-        ), "Should guard against literal 'latest' tag"
+        assert '_RESOLVED_LLAMA_TAG" != "latest"' in content, (
+            "Should guard against literal 'latest' tag"
+        )
 
-    def test_setup_sh_latest_resolution_queries_unsloth_first(self):
-        """The Unsloth repo should be queried before ggml-org."""
+    def test_setup_sh_latest_resolution_queries_bitsloth_first(self):
+        """The Bitsloth repo should be queried before ggml-org."""
         content = SETUP_SH.read_text()
-        idx_unsloth = content.find("_HELPER_RELEASE_REPO}/releases/latest")
+        idx_bitsloth = content.find("_HELPER_RELEASE_REPO}/releases/latest")
         idx_ggml = content.find("ggml-org/llama.cpp/releases/latest")
-        assert idx_unsloth != -1, "Unsloth API query not found"
+        assert idx_bitsloth != -1, "Bitsloth API query not found"
         assert idx_ggml != -1, "ggml-org API query not found"
-        assert idx_unsloth < idx_ggml, "Unsloth should be queried before ggml-org"
+        assert idx_bitsloth < idx_ggml, "Bitsloth should be queried before ggml-org"
 
     def test_setup_ps1_uses_checkout_b(self):
         """PS1 should use checkout -B, not checkout --force FETCH_HEAD."""
         content = SETUP_PS1.read_text()
-        assert "checkout -B unsloth-llama-build" in content
+        assert "checkout -B bitsloth-llama-build" in content
         assert "checkout --force FETCH_HEAD" not in content
 
     def test_setup_ps1_clone_uses_branch_tag(self):
@@ -655,17 +655,17 @@ class TestSourceCodePatterns:
                 context = "\n".join(lines[max(0, i - 5) : i + 5])
                 if "LlamaCppDir" in context:
                     pytest.fail(
-                        f"Found 'git pull' in llama.cpp build section at line {i+1}"
+                        f"Found 'git pull' in llama.cpp build section at line {i + 1}"
                     )
 
-    def test_setup_ps1_latest_resolution_queries_unsloth_first(self):
-        """PS1 should query Unsloth repo before ggml-org."""
+    def test_setup_ps1_latest_resolution_queries_bitsloth_first(self):
+        """PS1 should query Bitsloth repo before ggml-org."""
         content = SETUP_PS1.read_text()
-        idx_unsloth = content.find("$HelperReleaseRepo/releases/latest")
+        idx_bitsloth = content.find("$HelperReleaseRepo/releases/latest")
         idx_ggml = content.find("ggml-org/llama.cpp/releases/latest")
-        assert idx_unsloth != -1, "Unsloth API query not found in PS1"
+        assert idx_bitsloth != -1, "Bitsloth API query not found in PS1"
         assert idx_ggml != -1, "ggml-org API query not found in PS1"
-        assert idx_unsloth < idx_ggml, "Unsloth should be queried before ggml-org"
+        assert idx_bitsloth < idx_ggml, "Bitsloth should be queried before ggml-org"
 
     def test_binary_env_linux_has_binary_parent(self):
         """The Linux branch of binary_env should include binary_path.parent."""

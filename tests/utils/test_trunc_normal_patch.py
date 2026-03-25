@@ -1,4 +1,4 @@
-# Copyright 2023-present Daniel Han-Chen, Michael Han-Chen & the Unsloth team. All rights reserved.
+# Copyright 2023-present Daniel Han-Chen, Michael Han-Chen & the Bitsloth team. All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -28,9 +28,9 @@ _MISSING = object()
 
 def _load_import_fixes_module():
     repo_root = Path(__file__).resolve().parents[2]
-    import_fixes_path = repo_root / "unsloth" / "import_fixes.py"
+    import_fixes_path = repo_root / "bitsloth" / "import_fixes.py"
     spec = importlib.util.spec_from_file_location(
-        "unsloth_import_fixes_local", import_fixes_path
+        "bitsloth_import_fixes_local", import_fixes_path
     )
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -56,16 +56,16 @@ def test_trunc_normal_patch_accepts_positional_generator():
 
     init_mod = torch.nn.init
     old_fn = init_mod.trunc_normal_
-    old_patched = _getattr_or_missing(init_mod, "_unsloth_trunc_normal_patched")
-    old_original = _getattr_or_missing(init_mod, "_unsloth_trunc_normal_original")
+    old_patched = _getattr_or_missing(init_mod, "_bitsloth_trunc_normal_patched")
+    old_original = _getattr_or_missing(init_mod, "_bitsloth_trunc_normal_original")
     try:
         # Normalize to an unpatched baseline before applying the patch.
         if old_original is not _MISSING:
             init_mod.trunc_normal_ = old_original
-        if hasattr(init_mod, "_unsloth_trunc_normal_patched"):
-            delattr(init_mod, "_unsloth_trunc_normal_patched")
-        if hasattr(init_mod, "_unsloth_trunc_normal_original"):
-            delattr(init_mod, "_unsloth_trunc_normal_original")
+        if hasattr(init_mod, "_bitsloth_trunc_normal_patched"):
+            delattr(init_mod, "_bitsloth_trunc_normal_patched")
+        if hasattr(init_mod, "_bitsloth_trunc_normal_original"):
+            delattr(init_mod, "_bitsloth_trunc_normal_original")
 
         patch_fn()
         sig = inspect.signature(init_mod.trunc_normal_)
@@ -80,8 +80,8 @@ def test_trunc_normal_patch_accepts_positional_generator():
         init_mod.trunc_normal_(tensor, mean = 0.0, std = 1.0, a = -2.0, b = 2.0, generator = gen)
     finally:
         init_mod.trunc_normal_ = old_fn
-        _restore_attr(init_mod, "_unsloth_trunc_normal_patched", old_patched)
-        _restore_attr(init_mod, "_unsloth_trunc_normal_original", old_original)
+        _restore_attr(init_mod, "_bitsloth_trunc_normal_patched", old_patched)
+        _restore_attr(init_mod, "_bitsloth_trunc_normal_original", old_original)
 
 
 def test_trunc_normal_patch_rejects_invalid_generator():
@@ -90,15 +90,15 @@ def test_trunc_normal_patch_rejects_invalid_generator():
 
     init_mod = torch.nn.init
     old_fn = init_mod.trunc_normal_
-    old_patched = _getattr_or_missing(init_mod, "_unsloth_trunc_normal_patched")
-    old_original = _getattr_or_missing(init_mod, "_unsloth_trunc_normal_original")
+    old_patched = _getattr_or_missing(init_mod, "_bitsloth_trunc_normal_patched")
+    old_original = _getattr_or_missing(init_mod, "_bitsloth_trunc_normal_original")
     try:
         if old_original is not _MISSING:
             init_mod.trunc_normal_ = old_original
-        if hasattr(init_mod, "_unsloth_trunc_normal_patched"):
-            delattr(init_mod, "_unsloth_trunc_normal_patched")
-        if hasattr(init_mod, "_unsloth_trunc_normal_original"):
-            delattr(init_mod, "_unsloth_trunc_normal_original")
+        if hasattr(init_mod, "_bitsloth_trunc_normal_patched"):
+            delattr(init_mod, "_bitsloth_trunc_normal_patched")
+        if hasattr(init_mod, "_bitsloth_trunc_normal_original"):
+            delattr(init_mod, "_bitsloth_trunc_normal_original")
 
         patch_fn()
         sig = inspect.signature(init_mod.trunc_normal_)
@@ -110,5 +110,5 @@ def test_trunc_normal_patch_rejects_invalid_generator():
             init_mod.trunc_normal_(tensor, generator = 123)
     finally:
         init_mod.trunc_normal_ = old_fn
-        _restore_attr(init_mod, "_unsloth_trunc_normal_patched", old_patched)
-        _restore_attr(init_mod, "_unsloth_trunc_normal_original", old_original)
+        _restore_attr(init_mod, "_bitsloth_trunc_normal_patched", old_patched)
+        _restore_attr(init_mod, "_bitsloth_trunc_normal_original", old_original)

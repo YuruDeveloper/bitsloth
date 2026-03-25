@@ -5,28 +5,28 @@ import tempfile
 import pytest
 import importlib
 
-from unsloth import FastLanguageModel, FastModel
+from bitsloth import FastLanguageModel, FastModel
 
 model_to_test = [
     # Text Models
-    "unsloth/tinyllama",
-    "unsloth/tinyllama-bnb-4bit",
-    "unsloth/Qwen2.5-0.5B-Instruct",
-    "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
-    "unsloth/Phi-4-mini-instruct",
-    "unsloth/Phi-4-mini-instruct-bnb-4bit",
-    "unsloth/Qwen2.5-0.5B",
+    unsloth/tinyllama",
+    unsloth/tinyllama-bnb-4bit",
+    unsloth/Qwen2.5-0.5B-Instruct",
+    unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
+    unsloth/Phi-4-mini-instruct",
+    unsloth/Phi-4-mini-instruct-bnb-4bit",
+    unsloth/Qwen2.5-0.5B",
     # Vision Models
-    "unsloth/gemma-3-4b-it",
-    "unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
-    "unsloth/Qwen2.5-VL-3B-Instruct-bnb-4bit",
+    unsloth/gemma-3-4b-it",
+    unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+    unsloth/Qwen2.5-VL-3B-Instruct-bnb-4bit",
 ]
 
 torchao_models = [
-    "unsloth/tinyllama",
-    "unsloth/Qwen2.5-0.5B-Instruct",
-    # "unsloth/Phi-4-mini-instruct",
-    # "unsloth/Qwen2.5-0.5B",
+    unsloth/tinyllama",
+    unsloth/Qwen2.5-0.5B-Instruct",
+    # unsloth/Phi-4-mini-instruct",
+    # unsloth/Qwen2.5-0.5B",
     # Skip the -bnb-4bit variants since they're already quantized
 ]
 
@@ -61,7 +61,7 @@ def loaded_model_tokenizer(request):
         r = 16,
         target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"],
         lora_alpha = 16,
-        use_gradient_checkpointing = "unsloth",
+        use_gradient_checkpointing = "bitsloth",
     )
 
     return model, tokenizer
@@ -86,7 +86,7 @@ def fp16_model_tokenizer(request):
         r = 16,
         target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"],
         lora_alpha = 16,
-        use_gradient_checkpointing = "unsloth",
+        use_gradient_checkpointing = "bitsloth",
     )
 
     return model, tokenizer
@@ -128,7 +128,7 @@ def delete_quantization_config(model):
 def test_save_merged_16bit(model, tokenizer, temp_save_dir: str):
     save_path = os.path.join(
         temp_save_dir,
-        "unsloth_merged_16bit",
+        "bitsloth_merged_16bit",
         model.config._name_or_path.replace("/", "_"),
     )
 
@@ -181,7 +181,7 @@ def test_save_merged_16bit(model, tokenizer, temp_save_dir: str):
 def test_save_merged_4bit(model, tokenizer, temp_save_dir: str):
     save_path = os.path.join(
         temp_save_dir,
-        "unsloth_merged_4bit",
+        "bitsloth_merged_4bit",
         model.config._name_or_path.replace("/", "_"),
     )
 
@@ -243,7 +243,7 @@ def test_save_merged_4bit(model, tokenizer, temp_save_dir: str):
 def test_save_torchao(fp16_model_tokenizer, temp_save_dir: str):
     model, tokenizer = fp16_model_tokenizer
     save_path = os.path.join(
-        temp_save_dir, "unsloth_torchao", model.config._name_or_path.replace("/", "_")
+        temp_save_dir, "bitsloth_torchao", model.config._name_or_path.replace("/", "_")
     )
 
     from torchao.quantization import Int8DynamicActivationInt8WeightConfig
