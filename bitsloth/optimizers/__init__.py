@@ -14,8 +14,11 @@
 
 from .q_galore_projector import GaLoreProjector
 from .q_galore_adamw import QGaLoreAdamW8bit
+from .lora_pre import LoRAPreOptimizer, create_lora_pre_optimizer
 
 __all__ = [
     "GaLoreProjector",
     "QGaLoreAdamW8bit",
+    "LoRAPreOptimizer",
+    "create_lora_pre_optimizer",
 ]
