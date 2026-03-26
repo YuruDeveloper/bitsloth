@@ -1406,7 +1406,7 @@ def _get_statistics(statistics=None, force_download=True):
                     "pip install modelscope\n"
                     "import os; os.environ['BITSLOTH_USE_MODELSCOPE'] = '1'\n"
                     "from bitsloth import FastLanguageModel\n"
-                    "model = FastLanguageModel.from_pretrained(bitsloth/gpt-oss-20b')\n"
+                    "model = FastLanguageModel.from_pretrained('bitsloth/gpt-oss-20b')\n"
                     "```"
                 )
             except Exception:

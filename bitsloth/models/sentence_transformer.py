@@ -482,7 +482,7 @@ This sentence-transformers model was finetuned and converted to GGUF format usin
 
         readme_content += (
             "\nThis was trained 2x faster with [Bitsloth](https://github.com/bitslothai/bitsloth)\n"
-            '[<img src="https://raw.githubusercontent.com/bitslothai/bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)\n'
+            '[<img src="https://raw.githubusercontent.com/bitslothai/"bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)\n'
         )
 
         readme_path = os.path.join(temp_dir, "README.md")
@@ -967,7 +967,7 @@ class FastSentenceTransformer(FastModel):
         # add branding badge and text
         branding = (
             "\n\nThis model was finetuned with [Bitsloth](https://github.com/bitslothai/bitsloth).\n\n"
-            '[<img src="https://raw.githubusercontent.com/bitslothai/bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)\n'
+            '[<img src="https://raw.githubusercontent.com/bitslothai/"bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)\n'
         )
 
         # add to description

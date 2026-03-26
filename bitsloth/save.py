@@ -1478,7 +1478,7 @@ language:
 
 This {model_type} model was trained 2x faster with [Bitsloth](https://github.com/bitslothai/bitsloth)
 
-[<img src="https://raw.githubusercontent.com/bitslothai/bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)
+[<img src="https://raw.githubusercontent.com/bitslothai/"bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)
 """
 
 
@@ -2408,7 +2408,7 @@ This model was finetuned and converted to GGUF format using [Bitsloth](https://g
 
         readme_content += (
             "This was trained 2x faster with [Bitsloth](https://github.com/bitslothai/bitsloth)\n"
-            '[<img src="https://raw.githubusercontent.com/bitslothai/bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)\n'
+            '[<img src="https://raw.githubusercontent.com/bitslothai/"bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)\n'
         )
 
         readme_path = os.path.join(actual_save_directory, "README.md")

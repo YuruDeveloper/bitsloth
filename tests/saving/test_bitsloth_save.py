@@ -9,24 +9,24 @@ from bitsloth import FastLanguageModel, FastModel
 
 model_to_test = [
     # Text Models
-    bitsloth/tinyllama",
-    bitsloth/tinyllama-bnb-4bit",
-    bitsloth/Qwen2.5-0.5B-Instruct",
-    bitsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
-    bitsloth/Phi-4-mini-instruct",
-    bitsloth/Phi-4-mini-instruct-bnb-4bit",
-    bitsloth/Qwen2.5-0.5B",
+    "bitsloth/tinyllama",
+    "bitsloth/tinyllama-bnb-4bit",
+    "bitsloth/Qwen2.5-0.5B-Instruct",
+    "bitsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
+    "bitsloth/Phi-4-mini-instruct",
+    "bitsloth/Phi-4-mini-instruct-bnb-4bit",
+    "bitsloth/Qwen2.5-0.5B",
     # Vision Models
-    bitsloth/gemma-3-4b-it",
-    bitsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
-    bitsloth/Qwen2.5-VL-3B-Instruct-bnb-4bit",
+    "bitsloth/gemma-3-4b-it",
+    "bitsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+    "bitsloth/Qwen2.5-VL-3B-Instruct-bnb-4bit",
 ]
 
 torchao_models = [
-    bitsloth/tinyllama",
-    bitsloth/Qwen2.5-0.5B-Instruct",
-    # bitsloth/Phi-4-mini-instruct",
-    # bitsloth/Qwen2.5-0.5B",
+    "bitsloth/tinyllama",
+    "bitsloth/Qwen2.5-0.5B-Instruct",
+    # "bitsloth/Phi-4-mini-instruct",
+    # "bitsloth/Qwen2.5-0.5B",
     # Skip the -bnb-4bit variants since they're already quantized
 ]
 

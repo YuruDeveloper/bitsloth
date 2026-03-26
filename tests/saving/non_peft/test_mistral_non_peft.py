@@ -16,7 +16,7 @@ print("🔍 PHASE 1: Loading Base Model")
 print(f"{'='*80}")
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = bitsloth/mistral-7b-v0.3",
+    model_name = "bitsloth/mistral-7b-v0.3",
     max_seq_length = 2048,
     dtype = None,
     load_in_4bit = True,

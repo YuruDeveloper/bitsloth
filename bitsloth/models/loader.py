@@ -222,7 +222,7 @@ def _fix_rope_inv_freq(model):
 class FastLanguageModel(FastLlamaModel):
     @staticmethod
     def from_pretrained(
-        model_name = bitsloth/Llama-3.2-1B-Instruct",
+        model_name = "bitsloth/Llama-3.2-1B-Instruct",
         max_seq_length = 2048,
         dtype = None,
         load_in_4bit = True,  # 4bit QLoRA
@@ -829,7 +829,7 @@ class FastModel(FastBaseModel):
 
     @staticmethod
     def from_pretrained(
-        model_name = bitsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+        model_name = "bitsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
         max_seq_length = 2048,
         dtype = None,
         load_in_4bit = True,  # 4bit QLoRA

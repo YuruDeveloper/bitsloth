@@ -116,7 +116,7 @@ if __name__ == "__main__":
         attn_implementation = "sdpa"
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name = bitsloth/Phi-4",
+        model_name = "bitsloth/Phi-4",
         max_seq_length = 2048,
         dtype = compute_dtype,
         load_in_4bit = True,

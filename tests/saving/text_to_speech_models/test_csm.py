@@ -26,7 +26,7 @@ print(f"{'='*80}")
 
 
 model, tokenizer = FastModel.from_pretrained(
-    model_name = bitsloth/csm-1b",
+    model_name = "bitsloth/csm-1b",
     max_seq_length = 2048,  # Choose any for long context!
     dtype = None,  # Leave as None for auto-detection
     auto_model = CsmForConditionalGeneration,
@@ -119,7 +119,7 @@ model, processor = FastModel.from_pretrained(
 
 from transformers import AutoProcessor
 
-processor = AutoProcessor.from_pretrained(bitsloth/csm-1b")
+processor = AutoProcessor.from_pretrained("bitsloth/csm-1b")
 
 print("✅ Model loaded for inference successfully!")
 

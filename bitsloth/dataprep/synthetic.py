@@ -158,7 +158,7 @@ class PipeCapture:
 class SyntheticDataKit:
     def __init__(
         self,
-        model_name = bitsloth/Llama-3.1-8B-Instruct-bitsloth-bnb-4bit",
+        model_name = "bitsloth/Llama-3.1-8B-Instruct-bitsloth-bnb-4bit",
         max_seq_length = 2048,
         gpu_memory_utilization = 0.98,
         float8_kv_cache = False,
@@ -312,7 +312,7 @@ class SyntheticDataKit:
 
     @staticmethod
     def from_pretrained(
-        model_name = bitsloth/Llama-3.1-8B-Instruct-bitsloth-bnb-4bit",
+        model_name = "bitsloth/Llama-3.1-8B-Instruct-bitsloth-bnb-4bit",
         max_seq_length = 2048,
         gpu_memory_utilization = 0.9,
         float8_kv_cache = False,

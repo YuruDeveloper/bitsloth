@@ -81,7 +81,7 @@ model_comparison_results = {}
 # Load Base Model
 
 model, tokenizer = FastVisionModel.from_pretrained(
-    model_name = bitsloth/Qwen2.5-VL-32B-Instruct-bnb-4bit",
+    model_name = "bitsloth/Qwen2.5-VL-32B-Instruct-bnb-4bit",
     max_seq_length = 2048,  # Choose any for long context!
     load_in_4bit = True,  # 4 bit quantization to reduce memory
     load_in_8bit = False,  # [NEW!] A bit more accurate, uses 2x memory

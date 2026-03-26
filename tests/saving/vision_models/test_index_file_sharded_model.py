@@ -80,8 +80,8 @@ print("=" * 80 + "\n")
 print("🤖 Loading base vision model...")
 try:
     model, tokenizer = FastVisionModel.from_pretrained(
-        # model_name = bitsloth/Qwen2-VL-7B-Instruct",
-        model_name = bitsloth/Qwen2-VL-7B-Instruct",
+        # model_name = "bitsloth/Qwen2-VL-7B-Instruct",
+        model_name = "bitsloth/Qwen2-VL-7B-Instruct",
         max_seq_length = 2048,  # Choose any for long context!
         load_in_4bit = True,  # 4 bit quantization to reduce memory
         load_in_8bit = False,  # [NEW!] A bit more accurate, uses 2x memory

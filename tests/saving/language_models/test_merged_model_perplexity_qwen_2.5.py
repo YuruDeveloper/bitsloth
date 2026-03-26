@@ -182,7 +182,7 @@ if __name__ == "__main__":
         attn_implementation = "sdpa"
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name = bitsloth/Qwen2.5-7B-Instruct",
+        model_name = "bitsloth/Qwen2.5-7B-Instruct",
         max_seq_length = 2048,
         dtype = compute_dtype,
         load_in_4bit = True,

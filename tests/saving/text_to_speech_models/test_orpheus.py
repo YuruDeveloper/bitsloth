@@ -30,7 +30,7 @@ print(f"{'='*80}")
 
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = bitsloth/orpheus-3b-0.1-ft",
+    model_name = "bitsloth/orpheus-3b-0.1-ft",
     max_seq_length = 2048,  # Choose any for long context!
     dtype = None,  # Select None for auto detection
     load_in_4bit = False,  # Select True for 4bit which reduces memory usage
@@ -112,7 +112,7 @@ print(f"{'='*80}")
 
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = bitsloth/orpheus-3b-0.1-ft",
+    model_name = "bitsloth/orpheus-3b-0.1-ft",
     max_seq_length = 2048,  # Choose any for long context!
     dtype = None,  # Select None for auto detection
     load_in_4bit = False,  # Select True for 4bit which reduces memory usage
@@ -120,7 +120,7 @@ model, tokenizer = FastLanguageModel.from_pretrained(
 )
 
 # from transformers import AutoProcessor
-# processor = AutoProcessor.from_pretrained(bitsloth/csm-1b")
+# processor = AutoProcessor.from_pretrained("bitsloth/csm-1b")
 
 print("✅ Model loaded for inference successfully!")
 

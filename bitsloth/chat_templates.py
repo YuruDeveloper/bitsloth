@@ -2214,11 +2214,11 @@ extra_eos_tokens = None,
 
     # Check tokenizer types
     tokenizer_name = tokenizer.name_or_path.lower()
-    if tokenizer_name.startswith((bitsloth/llama-3-8b-instruct", bitsloth/llama-3-70b-instruct")):
+    if tokenizer_name.startswith(("bitsloth/llama-3-8b-instruct", "bitsloth/llama-3-70b-instruct")):
         # Add <|eot_id|>
         extra_eos_tokens.append("<|eot_id|>")
     elif ("<|eot_id|>" in extra_eos_tokens or "<|eot_id|>" in chat_template) and \
-        tokenizer_name.startswith((bitsloth/llama-3-8b", bitsloth/llama-3-70b")):
+        tokenizer_name.startswith(("bitsloth/llama-3-8b", "bitsloth/llama-3-70b")):
         # Warn
         logger.warning(
             "Bitsloth: Base llama-3 models did not train <|eot_id|>.\n"\
@@ -2606,7 +2606,7 @@ def test_chat_templates():
 
     # Llama
     template = llama_template
-    correct_tokenizer = AutoTokenizer.from_pretrained(bitsloth/llama-2-7b-chat")
+    correct_tokenizer = AutoTokenizer.from_pretrained("bitsloth/llama-2-7b-chat")
     correct_prompt = correct_tokenizer.apply_chat_template(messages, tokenize = False, add_generation_prompt = True)
     correct_tokenizer.chat_template = template
     our_prompt = correct_tokenizer.apply_chat_template(messages, tokenize = False, add_generation_prompt = True)
@@ -2649,7 +2649,7 @@ def test_chat_templates():
     assert(correct_prompt == our_prompt.replace("</s>", ""))
 
     # Gemma
-    correct_tokenizer = AutoTokenizer.from_pretrained(bitsloth/gemma-7b-it")
+    correct_tokenizer = AutoTokenizer.from_pretrained("bitsloth/gemma-7b-it")
     correct_prompt = correct_tokenizer.apply_chat_template(messages[1:], tokenize = False, add_generation_prompt = True)
     correct_tokenizer.chat_template = gemma_template
     our_prompt = correct_tokenizer.apply_chat_template(messages[1:], tokenize = False, add_generation_prompt = True)
@@ -2657,7 +2657,7 @@ def test_chat_templates():
 
     # Llama-3
     template = llama3_template
-    correct_tokenizer = AutoTokenizer.from_pretrained(bitsloth/llama-3-8b-Instruct")
+    correct_tokenizer = AutoTokenizer.from_pretrained("bitsloth/llama-3-8b-Instruct")
     correct_prompt = correct_tokenizer.apply_chat_template(messages, tokenize = False, add_generation_prompt = True)
     correct_tokenizer.chat_template = template
     our_prompt = correct_tokenizer.apply_chat_template(messages, tokenize = False, add_generation_prompt = True)
