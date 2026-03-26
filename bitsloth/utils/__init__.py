@@ -30,6 +30,14 @@ from .attention_dispatch import (
     run_attention,
     select_attention_backend,
 )
+from .gpu_utils import (
+    get_gpu_count,
+    build_max_memory,
+    get_first_device,
+    print_gpu_summary,
+    max_memory_to_str,
+    max_memory_from_str,
+)
 
 __all__ = [
     "configure_sample_packing",
@@ -45,4 +53,10 @@ __all__ = [
     "SDPA",
     "run_attention",
     "select_attention_backend",
+    "get_gpu_count",
+    "build_max_memory",
+    "get_first_device",
+    "print_gpu_summary",
+    "max_memory_to_str",
+    "max_memory_from_str",
 ]

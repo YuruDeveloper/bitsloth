@@ -30,6 +30,7 @@ from bitsloth.utils import (
     configure_sample_packing,
     enable_padding_free_metadata,
     enable_sample_packing,
+    get_gpu_count,
 )
 from unsloth_zoo.training_utils import (
     bitsloth_train as _bitsloth_train,
@@ -50,6 +51,7 @@ __all__ = [
     "QGaloreConfig",
     "BitNetConfig",
     "TwoStageBitNetScheduler",
+    "save_model_with_meta",
 ]
 
 logger = logging.getLogger(__name__)
@@ -864,3 +866,117 @@ def _patch_trl_trainer():
     _patch_sft_trainer_auto_packing(trl)
 
     trl.__BITSLOTH_BACKWARDS_COMPATIBLE__ = True
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# BitNet 모델 저장 유틸리티
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+def save_model_with_meta(
+    model,
+    tokenizer,
+    optimizer=None,
+    save_dir: str = "./output",
+    push_to_hub: bool = False,
+    hub_model_id: Optional[str] = None,
+    private: bool = True,
+    token: Optional[str] = None,
+) -> None:
+    """
+    모델, 토크나이저, 옵티마이저 상태를 저장하고 convert_info.json 메타데이터를 생성합니다.
+
+    Args:
+        model: 저장할 모델
+        tokenizer: 토크나이저
+        optimizer: 옵티마이저 (선택)
+        save_dir: 저장 디렉토리
+        push_to_hub: Hub 업로드 여부
+        hub_model_id: Hub 레포 ID
+        private: 비공개 레포 여부
+        token: HuggingFace 토큰
+    """
+    import json as json_module
+
+    os.makedirs(save_dir, exist_ok=True)
+
+    # 모델 & 토크나이저 저장
+    model.save_pretrained(save_dir)
+    tokenizer.save_pretrained(save_dir)
+
+    # 옵티마이저 상태 저장
+    if optimizer is not None:
+        torch.save(optimizer.state_dict(), os.path.join(save_dir, "optimizer.pt"))
+
+    # BitNet 레이어 정보 수집
+    from bitsloth.models.bitnet import BitNetLinear, BitNetLinear4Bit
+
+    bitnet_layers = []
+    alpha_values = []
+    for name, mod in model.named_modules():
+        if isinstance(mod, (BitNetLinear, BitNetLinear4Bit)):
+            bitnet_layers.append(name)
+            if hasattr(mod, "alpha"):
+                val = (
+                    mod.alpha.item() if hasattr(mod.alpha, "item") else float(mod.alpha)
+                )
+                alpha_values.append(val)
+
+    # 메타데이터 생성
+    n_gpu = get_gpu_count()
+    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    frozen = sum(p.numel() for p in model.parameters() if not p.requires_grad)
+
+    meta = {
+        "base_model": getattr(getattr(model, "config", {}), "_name_or_path", "unknown"),
+        "conversion_type": "BitNet b1.58 + LoRA-Pre",
+        "quantization": "ternary_STE",
+        "optimizer": "LoRA-Pre (ICLR 2026)",
+        "multi_gpu": n_gpu > 1,
+        "num_gpus": n_gpu,
+        "device_strategy": "device_map=auto (model parallel)",
+        "bitnet_layers": len(bitnet_layers),
+        "trainable_params": trainable,
+        "frozen_params": frozen,
+        "alpha_stats": {
+            "count": len(alpha_values),
+            "min": min(alpha_values) if alpha_values else 0,
+            "max": max(alpha_values) if alpha_values else 0,
+            "mean": sum(alpha_values) / len(alpha_values) if alpha_values else 0,
+        },
+        "paper_references": [
+            "The Era of 1-bit LLMs: Training Tips, Code and FAQ",
+            "Taming Momentum: Rethinking Optimizer States Through Low-Rank Approximation (ICLR 2026)",
+        ],
+    }
+    with open(os.path.join(save_dir, "convert_info.json"), "w") as f:
+        json_module.dump(meta, f, indent=2, ensure_ascii=False)
+
+    print(f"[저장 완료] {save_dir}")
+    print(f"  BitNet 레이어: {len(bitnet_layers)}개")
+    print(f"  학습 가능: {trainable:,} 파라미터")
+    print(f"  고정: {frozen:,} 파라미터")
+
+    # Hub 업로드
+    if push_to_hub and hub_model_id:
+        try:
+            from huggingface_hub import HfApi, create_repo
+
+            api = HfApi(token=token)
+            create_repo(
+                repo_id=hub_model_id,
+                token=token,
+                repo_type="model",
+                private=private,
+                exist_ok=True,
+            )
+            api.upload_folder(
+                folder_path=save_dir,
+                repo_id=hub_model_id,
+                repo_type="model",
+                commit_message="BitNet b1.58 + LoRA-Pre model",
+                ignore_patterns=["optimizer.pt"],
+            )
+            print(f"[Hub 업로드 완료] https://huggingface.co/{hub_model_id}")
+        except Exception as exc:
+            print(f"[Hub 업로드 실패] {exc}")
