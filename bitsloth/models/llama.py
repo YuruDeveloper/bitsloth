@@ -2185,7 +2185,7 @@ class FastLlamaModel:
 
     @staticmethod
     def from_pretrained(
-        model_name = unsloth/llama-3-8b-bnb-4bit",
+        model_name = "unsloth/llama-3-8b-bnb-4bit",
         max_seq_length = None,
         dtype = None,
         load_in_4bit = True,
@@ -2632,7 +2632,7 @@ class FastLlamaModel:
         # Not necessary anymore since we require transformers>=4.37!
         if False:
             name = model.config._name_or_path
-            if name.startswith(unsloth/") and name.endswith("-bnb-4bit"):
+            if name.startswith("unsloth/") and name.endswith("-bnb-4bit"):
                 name = name[: len(name) - len("-bnb-4bit")]
                 model.config.update({"_name_or_path": name})
 
@@ -3281,7 +3281,7 @@ class FastLlamaModel:
             # Not necessary since we requires transformers >= 4.37
             if False:
                 name = model.peft_config[active_adapter].base_model_name_or_path
-                if name.startswith(unsloth/") and name.endswith("-bnb-4bit"):
+                if name.startswith("unsloth/") and name.endswith("-bnb-4bit"):
                     name = name[: len(name) - len("-bnb-4bit")]
                     model.peft_config[active_adapter].base_model_name_or_path = name
                 pass
