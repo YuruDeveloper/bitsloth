@@ -436,7 +436,7 @@ class TestLatestTagResolution:
         _REQUESTED_LLAMA_TAG="{requested_tag}"
         _RESOLVED_LLAMA_TAG=""
         _RESOLVE_UPSTREAM_STATUS=1
-        _HELPER_RELEASE_REPO="unslothai/llama.cpp"
+        _HELPER_RELEASE_REPO="bitslothai/llama.cpp"
         if [ "$_RESOLVE_UPSTREAM_STATUS" -ne 0 ] || [ -z "$_RESOLVED_LLAMA_TAG" ]; then
             if [ "$_REQUESTED_LLAMA_TAG" = "latest" ]; then
                 _RESOLVED_LLAMA_TAG="$(curl -fsSL "https://api.github.com/repos/${{_HELPER_RELEASE_REPO}}/releases/latest" 2>/dev/null | python -c "import sys,json; print(json.load(sys.stdin)['tag_name'])" 2>/dev/null)" || _RESOLVED_LLAMA_TAG=""
@@ -459,11 +459,11 @@ class TestLatestTagResolution:
         lines = ["#!/bin/bash"]
         if bitsloth_response is not None:
             lines.append(
-                f'if echo "$*" | grep -q "unslothai/llama.cpp"; then echo \'{bitsloth_response}\'; exit 0; fi'
+                f'if echo "$*" | grep -q "bitslothai/llama.cpp"; then echo \'{bitsloth_response}\'; exit 0; fi'
             )
         else:
             lines.append(
-                'if echo "$*" | grep -q "unslothai/llama.cpp"; then exit 1; fi'
+                'if echo "$*" | grep -q "bitslothai/llama.cpp"; then exit 1; fi'
             )
         if ggml_response is not None:
             lines.append(

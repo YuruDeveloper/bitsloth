@@ -1,9 +1,9 @@
 """
 BitNet b1.58 레이어 모듈
 - STE (Straight-Through Estimator) 기반 ternary 양자화
-- Unsloth 4bit 모델 위에 래핑하여 BitNet 학습 가능
+- bitsloth 4bit 모델 위에 래핑하여 BitNet 학습 가능
 
-설계 기반: UNSLOTH_BITNET_PLAN.md
+설계 기반: bitsloth_BITNET_PLAN.md
 참고: reference/The-Era-of-1-bit-LLMs__Training_Tips_Code_FAQ.md
 """
 
@@ -130,9 +130,9 @@ class BitNetLinear(nn.Module):
 
 class BitNetLinear4Bit(nn.Module):
     """
-    Unsloth 4bit 모델 위에 래핑하는 BitNet Linear
+    bitsloth 4bit 모델 위에 래핑하는 BitNet Linear
 
-    설계 (UNSLOTH_BITNET_PLAN.md):
+    설계 (bitsloth_BITNET_PLAN.md):
     - 원본 4bit weight: 고정 (gradient 차단)
     - 추가 학습 파라미터: α (scale factor) 만
     - forward: 4bit → 역양자화 → STE ternary → 출력
@@ -205,7 +205,7 @@ class BitNetLinear4Bit(nn.Module):
 # 점진적 변환 유틸리티
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# MoE 변환 순서 (UNSLOTH_BITNET_PLAN.md 기반)
+# MoE 변환 순서 (bitsloth_BITNET_PLAN.md 기반)
 CONVERSION_ORDER = ["ffn", "attention", "router"]
 
 
@@ -279,7 +279,7 @@ def convert_linear_to_bitnet(
 
     Args:
         module: 변환할 nn.Linear 모듈
-        use_4bit_wrapper: True이면 BitNetLinear4Bit (unsloth 4bit 모델용)
+        use_4bit_wrapper: True이면 BitNetLinear4Bit (bitsloth 4bit 모델용)
     """
     if use_4bit_wrapper:
         return BitNetLinear4Bit(
@@ -308,7 +308,7 @@ def apply_bitnet_conversion(
     Args:
         model: 변환할 모델
         target: 변환 대상 ("ffn", "attention", "router", "all")
-        use_4bit_wrapper: unsloth 4bit 모델용 래퍼 사용 여부
+        use_4bit_wrapper: bitsloth 4bit 모델용 래퍼 사용 여부
         verbose: 변환 로그 출력 여부
 
     Returns:
@@ -394,7 +394,7 @@ def convert_moe_progressive(
 
     Args:
         model: MoE 모델
-        use_4bit_wrapper: unsloth 4bit 모델용 래퍼 사용 여부
+        use_4bit_wrapper: bitsloth 4bit 모델용 래퍼 사용 여부
         verbose: 변환 로그 출력 여부
 
     Returns:

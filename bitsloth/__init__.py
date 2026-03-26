@@ -75,7 +75,7 @@ del already_imported, critical_modules
 # We do have a beta version, which you can contact us about!
 # Thank you for your understanding and we appreciate it immensely!
 
-# Fixes https://github.com/unslothai/bitsloth/issues/1266
+# Fixes https://github.com/bitslothai/bitsloth/issues/1266
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 
 # [TODO] Check why some GPUs don't work

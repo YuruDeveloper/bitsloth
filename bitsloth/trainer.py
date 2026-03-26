@@ -146,7 +146,7 @@ class BitNetConfig:
 
     # 점진적 변환 대상
     target: str = "ffn"  # "ffn", "attention", "router", "all"
-    # unsloth 4bit 모델용 래퍼 사용
+    # bitsloth 4bit 모델용 래퍼 사용
     use_4bit_wrapper: bool = True
     # LoRA-Pre 옵티마이저 저랭크 비율
     rank_ratio: float = 1 / 8

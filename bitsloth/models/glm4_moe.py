@@ -418,7 +418,7 @@ class FastGLM47Model(FastLlamaModel):
 
     @staticmethod
     def from_pretrained(
-        model_name = unsloth/GLM-4.7-Flash",
+        model_name = bitsloth/GLM-4.7-Flash",
         max_seq_length = 4096,
         dtype = None,
         load_in_4bit = True,

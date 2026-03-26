@@ -101,7 +101,7 @@ def make_artifact(asset_name, **overrides):
 
 def make_release(artifacts, **overrides):
     defaults = dict(
-        repo = "unslothai/llama.cpp",
+        repo = "bitslothai/llama.cpp",
         release_tag = "v1.0",
         upstream_tag = "b8508",
         assets = {a.asset_name: f"https://example.com/{a.asset_name}" for a in artifacts},
@@ -115,7 +115,7 @@ def make_release(artifacts, **overrides):
 
 def make_checksums(asset_names):
     return ApprovedReleaseChecksums(
-        repo = "unslothai/llama.cpp",
+        repo = "bitslothai/llama.cpp",
         release_tag = "v1.0",
         upstream_tag = "b8508",
         source_commit = None,
@@ -123,7 +123,7 @@ def make_checksums(asset_names):
             name: ApprovedArtifactHash(
                 asset_name = name,
                 sha256 = "a" * 64,
-                repo = "unslothai/llama.cpp",
+                repo = "bitslothai/llama.cpp",
                 kind = "prebuilt",
             )
             for name in asset_names

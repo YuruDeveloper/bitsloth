@@ -200,7 +200,7 @@ class FastQwen3MoeModel(FastQwen3Model):
         PeftModelForCausalLM.forward = PeftModel_fast_forward
         fix_prepare_inputs_for_generation(Qwen3MoeForCausalLM)
 
-        # Solves https://github.com/unslothai/bitsloth/issues/168
+        # Solves https://github.com/bitslothai/bitsloth/issues/168
         # Static KV Cache was introduced in 4.38.0, causing training to be much slower.
         # Inference can now be CUDAGraphed, but we shall retain the old rotary embeddings.
         # https://github.com/huggingface/transformers/pull/27931

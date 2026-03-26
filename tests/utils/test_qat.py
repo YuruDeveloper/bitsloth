@@ -39,7 +39,7 @@ def _get_model(qat_scheme: str, full_finetuning: bool):
     to use QAT. If `full_finetuning` is False, return the PEFT (LoRA) model.
     """
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name = unsloth/Qwen3-1.7B",
+        model_name = bitsloth/Qwen3-1.7B",
         load_in_4bit = False,
         full_finetuning = full_finetuning,
         qat_scheme = qat_scheme if full_finetuning else None,

@@ -52,7 +52,7 @@ else:
     attn_implementation = "sdpa"
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = unsloth/Llama-3.2-1B-Instruct",
+    model_name = bitsloth/Llama-3.2-1B-Instruct",
     max_seq_length = 2048,
     dtype = compute_dtype,
     load_in_4bit = True,

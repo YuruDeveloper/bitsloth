@@ -2,14 +2,14 @@
 __pycache__/
 *.py[cod]
 *.class
-unsloth_compiled_cache/
+bitsloth_compiled_cache/
 # ML artifacts (large files)
 feature/
 outputs/
 exports/
 /datasets/
 studio/backend/assets/datasets/
-unsloth_training_checkpoints/
+bitsloth_training_checkpoints/
 *.gguf
 *.safetensors
 

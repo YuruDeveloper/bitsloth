@@ -222,7 +222,7 @@ def _fix_rope_inv_freq(model):
 class FastLanguageModel(FastLlamaModel):
     @staticmethod
     def from_pretrained(
-        model_name = unsloth/Llama-3.2-1B-Instruct",
+        model_name = bitsloth/Llama-3.2-1B-Instruct",
         max_seq_length = 2048,
         dtype = None,
         load_in_4bit = True,  # 4bit QLoRA
@@ -829,7 +829,7 @@ class FastModel(FastBaseModel):
 
     @staticmethod
     def from_pretrained(
-        model_name = unsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
+        model_name = bitsloth/Llama-3.2-11B-Vision-Instruct-bnb-4bit",
         max_seq_length = 2048,
         dtype = None,
         load_in_4bit = True,  # 4bit QLoRA
@@ -1159,7 +1159,7 @@ class FastModel(FastBaseModel):
             # ROCm/HIP: Gemma3 compiled forward produces NaN on RDNA GPUs
             # (gfx1100, gfx1101, gfx1102, gfx1150, gfx1151, etc.).
             # Disable torch.compile for model forward; loss compilation is fine.
-            # See https://github.com/unslothai/bitsloth/issues/3385
+            # See https://github.com/bitslothai/bitsloth/issues/3385
             from bitsloth.kernels.utils import is_rdna
 
             if is_rdna():

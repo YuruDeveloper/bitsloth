@@ -1152,7 +1152,7 @@ rocm711-torch2100 = [
 [project.urls]
 homepage = "https://bitsloth.ai"
 documentation = "https://bitsloth.ai/docs"
-repository = "https://github.com/unslothai/bitsloth"
+repository = "https://github.com/bitslothai/bitsloth"
 
 [tool.ruff]
 target-version = "py311"

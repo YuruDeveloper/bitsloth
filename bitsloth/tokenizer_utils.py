@@ -56,8 +56,8 @@ IGNORED_TOKENIZER_CHECKING = frozenset(
 
 IGNORED_TOKENIZER_NAMES = [
     # Qwen Coder did not train on tool calling. Math did!
-    unsloth/Qwen2.5-Coder-1.5B-Instruct",
-    unsloth/Qwen2.5-Coder-7B-Instruct",
+    bitsloth/Qwen2.5-Coder-1.5B-Instruct",
+    bitsloth/Qwen2.5-Coder-7B-Instruct",
 ]
 IGNORED_TOKENIZER_NAMES = frozenset(
     [x.lower() for x in IGNORED_TOKENIZER_NAMES]
@@ -336,7 +336,7 @@ def assert_same_tokenization(slow_tokenizer, fast_tokenizer):
 
         return check_chat_template and check_special_tokens
     except:
-        # For eg see https://github.com/unslothai/bitsloth/issues/292
+        # For eg see https://github.com/bitslothai/bitsloth/issues/292
         # Sometimes tokenizer has weird tokens, causing a combined tokenization to fail.
         # [TODO] We temporarily disable this for CodeLlama tokenizers
         if slow_tokenizer.__repr__().split("(", 1)[0] in IGNORED_TOKENIZER_CHECKING:
@@ -755,7 +755,7 @@ def fix_chat_template(tokenizer):
 def check_tokenizer(
     model,
     tokenizer,
-    model_name = unsloth/llama-2-7b-bnb-4bit",
+    model_name = bitsloth/llama-2-7b-bnb-4bit",
     model_max_length = 4096,
     padding_side = "right",
     token = None,
@@ -907,7 +907,7 @@ def get_tokenizer_info(tokenizer) -> dict:
     Example output::
 
         {
-            "name_or_path": unsloth/Llama-3.2-1B-Instruct",
+            "name_or_path": bitsloth/Llama-3.2-1B-Instruct",
             "tokenizer_class": "PreTrainedTokenizerFast",
             "is_fast": True,
             "vocab_size": 128000,

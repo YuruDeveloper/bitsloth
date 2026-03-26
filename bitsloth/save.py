@@ -1476,9 +1476,9 @@ language:
 - **License:** apache-2.0
 - **Finetuned from model :** {base_model}
 
-This {model_type} model was trained 2x faster with [Bitsloth](https://github.com/unslothai/bitsloth)
+This {model_type} model was trained 2x faster with [Bitsloth](https://github.com/bitslothai/bitsloth)
 
-[<img src="https://raw.githubusercontent.com/unslothai/bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/unslothai/bitsloth)
+[<img src="https://raw.githubusercontent.com/bitslothai/bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)
 """
 
 
@@ -1720,7 +1720,7 @@ def create_ollama_modelfile(tokenizer, base_model_name, model_location):
     LEFT_BRACKET_REPLACER = "⚫@✅#🦥"
     RIGHT_BRACKET_REPLACER = "⚡@🦥#⛵"
 
-    # Fixes https://github.com/unslothai/bitsloth/issues/1087
+    # Fixes https://github.com/bitslothai/bitsloth/issues/1087
     # We must convert all {'s and }'s but keep {__FILE_LOCATION__} intact
     modelfile = (
         modelfile.replace("{__FILE_LOCATION__}", FILE_LOCATION_REPLACER)
@@ -2361,7 +2361,7 @@ tags:
 
 # {repo_id.split("/")[-1]} : GGUF
 
-This model was finetuned and converted to GGUF format using [Bitsloth](https://github.com/unslothai/bitsloth).
+This model was finetuned and converted to GGUF format using [Bitsloth](https://github.com/bitslothai/bitsloth).
 
 **Example usage**:
 - For text only LLMs:    `llama-cli -hf {repo_id} --jinja`
@@ -2407,8 +2407,8 @@ This model was finetuned and converted to GGUF format using [Bitsloth](https://g
             )
 
         readme_content += (
-            "This was trained 2x faster with [Bitsloth](https://github.com/unslothai/bitsloth)\n"
-            '[<img src="https://raw.githubusercontent.com/unslothai/bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/unslothai/bitsloth)\n'
+            "This was trained 2x faster with [Bitsloth](https://github.com/bitslothai/bitsloth)\n"
+            '[<img src="https://raw.githubusercontent.com/bitslothai/bitsloth/main/images/bitsloth%20made%20with%20love.png" width="200"/>](https://github.com/bitslothai/bitsloth)\n'
         )
 
         readme_path = os.path.join(actual_save_directory, "README.md")

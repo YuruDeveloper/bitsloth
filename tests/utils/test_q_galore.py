@@ -21,7 +21,7 @@ import torch
 import torch.nn as nn
 
 # Import the optimizers module directly to avoid triggering bitsloth.__init__
-# which requires unsloth_zoo and other heavy dependencies.
+# which requires bitsloth_zoo and other heavy dependencies.
 _repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 _optimizers_dir = os.path.join(_repo_root, "bitsloth", "optimizers")
 if _repo_root not in sys.path:

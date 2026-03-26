@@ -877,7 +877,7 @@ if DEVICE_TYPE == "cuda":
             # Check for CUDA linking errors "undefined symbol: _ZNK3c106SymIntltEl"
             try:
                 try:
-                    # See https://github.com/unslothai/bitsloth/issues/1437
+                    # See https://github.com/bitslothai/bitsloth/issues/1437
                     from flash_attn.flash_attn_interface import flash_attn_gpu
                 except:
                     from flash_attn.flash_attn_interface import flash_attn_cuda
@@ -926,7 +926,7 @@ elif DEVICE_TYPE == "hip":
         # Check for CUDA linking errors "undefined symbol: _ZNK3c106SymIntltEl"
         try:
             try:
-                # See https://github.com/unslothai/bitsloth/issues/1437
+                # See https://github.com/bitslothai/bitsloth/issues/1437
                 from flash_attn.flash_attn_interface import flash_attn_gpu
             except:
                 from flash_attn.flash_attn_interface import flash_attn_cuda
@@ -1004,7 +1004,7 @@ try:
             "\n"
             "%%capture\n"
             "# Installs Bitsloth, Xformers (Flash Attention) and all other packages!\n"
-            '!pip install "bitsloth[colab-new] @ git+https://github.com/unslothai/bitsloth.git"\n'
+            '!pip install "bitsloth[colab-new] @ git+https://github.com/bitslothai/bitsloth.git"\n'
             '!pip install --no-deps "xformers<=0.0.27" trl peft accelerate bitsandbytes\n'
             "\n"
             f"Otherwise in local machines, your xformers version of {xformers_version} is too new.\n"
@@ -1073,7 +1073,7 @@ if False:  # Version(trl_version) >= Version("0.9.0"):
         "\n"
         "%%capture\n"
         "# Installs Bitsloth, Xformers (Flash Attention) and all other packages!\n"
-        '!pip install "bitsloth[colab-new] @ git+https://github.com/unslothai/bitsloth.git"\n'
+        '!pip install "bitsloth[colab-new] @ git+https://github.com/bitslothai/bitsloth.git"\n'
         '!pip install --no-deps "xformers<=0.0.27" trl peft accelerate bitsandbytes\n'
         "\n"
         f"Otherwise in local machines, your TRL version of {trl_version} is too new.\n"
@@ -1388,7 +1388,7 @@ def _get_statistics(statistics=None, force_download=True):
             def stats_check():
                 with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as f:
                     snapshot_download(
-                        f"unslothai/{statistics}",
+                        f"bitslothai/{statistics}",
                         force_download=True,
                         cache_dir=f,
                         local_dir=f,
@@ -1406,7 +1406,7 @@ def _get_statistics(statistics=None, force_download=True):
                     "pip install modelscope\n"
                     "import os; os.environ['BITSLOTH_USE_MODELSCOPE'] = '1'\n"
                     "from bitsloth import FastLanguageModel\n"
-                    "model = FastLanguageModel.from_pretrained(unsloth/gpt-oss-20b')\n"
+                    "model = FastLanguageModel.from_pretrained(bitsloth/gpt-oss-20b')\n"
                     "```"
                 )
             except Exception:
@@ -2839,7 +2839,7 @@ def make_fast_generate_wrapper(original_generate):
 # without a quant_state, producing "Skipping ... no quant_state found" warnings.
 # We patch should_convert_module to expand both the module name and the skip patterns
 # into all equivalent alias forms before delegating to the original matcher.
-# Ref: https://github.com/unslothai/bitsloth/issues/4208
+# Ref: https://github.com/bitslothai/bitsloth/issues/4208
 import transformers.quantizers.quantizers_utils as _quantizers_utils
 
 if (

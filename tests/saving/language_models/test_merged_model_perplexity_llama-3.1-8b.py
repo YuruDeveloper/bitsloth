@@ -113,7 +113,7 @@ if __name__ == "__main__":
         attn_implementation = "sdpa"
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name = unsloth/Llama-3.1-8B-Instruct",
+        model_name = bitsloth/Llama-3.1-8B-Instruct",
         max_seq_length = 2048,
         dtype = compute_dtype,
         load_in_4bit = True,

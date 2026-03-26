@@ -40,11 +40,11 @@ LOCAL_RANK_KEYS = ("LOCAL_RANK", "RANK")
 WORLD_SIZE_KEYS = ("WORLD_SIZE",)
 
 BAD_MAPPINGS = {
-    unsloth/Qwen3-32B-bitsloth-bnb-4bit".lower(): unsloth/Qwen3-32B-bnb-4bit".lower(),  # 32B dynamic quant is way too big
-    unsloth/Qwen3-30B-A3B-bitsloth-bnb-4bit".lower(): unsloth/Qwen3-30B-A3B".lower(),  # HF loads MoEs too slowly
-    unsloth/Qwen3-30B-A3B-bnb-4bit".lower(): unsloth/Qwen3-30B-A3B".lower(),  # We rather do it on the fly
-    unsloth/Qwen3-30B-A3B-Base-bitsloth-bnb-4bit".lower(): unsloth/Qwen3-30B-A3B-Base".lower(),  # HF loads MoEs too slowly
-    unsloth/Qwen3-30B-A3B-Base-bnb-4bit".lower(): unsloth/Qwen3-30B-A3B-Base".lower(),  # We rather do it on the fly
+    bitsloth/Qwen3-32B-bitsloth-bnb-4bit".lower(): bitsloth/Qwen3-32B-bnb-4bit".lower(),  # 32B dynamic quant is way too big
+    bitsloth/Qwen3-30B-A3B-bitsloth-bnb-4bit".lower(): bitsloth/Qwen3-30B-A3B".lower(),  # HF loads MoEs too slowly
+    bitsloth/Qwen3-30B-A3B-bnb-4bit".lower(): bitsloth/Qwen3-30B-A3B".lower(),  # We rather do it on the fly
+    bitsloth/Qwen3-30B-A3B-Base-bitsloth-bnb-4bit".lower(): bitsloth/Qwen3-30B-A3B-Base".lower(),  # HF loads MoEs too slowly
+    bitsloth/Qwen3-30B-A3B-Base-bnb-4bit".lower(): bitsloth/Qwen3-30B-A3B-Base".lower(),  # We rather do it on the fly
 }
 
 
@@ -178,7 +178,7 @@ def _get_new_mapper():
     try:
         import requests
 
-        new_mapper = "https://raw.githubusercontent.com/unslothai/bitsloth/main/bitsloth/models/mapper.py"
+        new_mapper = "https://raw.githubusercontent.com/bitslothai/bitsloth/main/bitsloth/models/mapper.py"
         with requests.get(new_mapper, timeout = 3) as new_mapper:
             new_mapper = new_mapper.text
         new_mapper = new_mapper[new_mapper.find("__INT_TO_FLOAT_MAPPER") :]
@@ -264,8 +264,8 @@ def get_model_name(
             raise NotImplementedError(
                 f"Bitsloth: {model_name} is not supported in your current Bitsloth version! Please update Bitsloth via:\n\n"
                 "pip uninstall bitsloth bitsloth_zoo -y\n"
-                'pip install --upgrade --no-cache-dir "bitsloth[colab-new] @ git+https://github.com/unslothai/bitsloth.git"\n'
-                'pip install --upgrade --no-cache-dir "git+https://github.com/unslothai/bitsloth-zoo.git"\n'
+                'pip install --upgrade --no-cache-dir "bitsloth[colab-new] @ git+https://github.com/bitslothai/bitsloth.git"\n'
+                'pip install --upgrade --no-cache-dir "git+https://github.com/bitslothai/bitsloth-zoo.git"\n'
             )
 
     if new_model_name is None:

@@ -40,7 +40,7 @@ def formatting_prompts_func(examples):
 print("Loading 4-bit Mxfp4 gpt-oss model for training...")
 max_seq_length = 1024
 model, tokenizer = FastLanguageModel.from_pretrained(
-    unsloth/gpt-oss-20b", max_seq_length = max_seq_length, load_in_4bit = True
+    bitsloth/gpt-oss-20b", max_seq_length = max_seq_length, load_in_4bit = True
 )
 
 dataset = load_dataset("HuggingFaceH4/Multilingual-Thinking", split = "train[:50]").map(

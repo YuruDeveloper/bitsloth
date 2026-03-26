@@ -159,7 +159,7 @@ def _rope_embedding(
     head_start = group_head_position * ROPE_GROUP_SIZE
     head_end = min((head_start + ROPE_GROUP_SIZE), n_heads)
 
-    # 10% Faster kernel from [HuyNguyen-hust](https://github.com/unslothai/bitsloth/pull/238)
+    # 10% Faster kernel from [HuyNguyen-hust](https://github.com/bitslothai/bitsloth/pull/238)
     for k in range(head_start, head_end):
         offs_q1 = row_position * Q_row_stride + k * head_dim + col_offsets
         offs_q2 = (

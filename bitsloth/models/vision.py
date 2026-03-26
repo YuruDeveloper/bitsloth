@@ -401,7 +401,7 @@ def _construct_vlm_processor_fallback(
 class FastBaseModel:
     @staticmethod
     def from_pretrained(
-        model_name = unsloth/Llama-3.2-1B-Instruct",
+        model_name = bitsloth/Llama-3.2-1B-Instruct",
         max_seq_length = 2048,
         dtype = None,
         load_in_4bit = True,
@@ -520,7 +520,7 @@ class FastBaseModel:
             f"   {chr(92)}{chr(92)}   /|    {gpu_stats_name}Num GPUs = {DEVICE_COUNT}. Max memory: {max_memory} GB. Platform: {platform_system}.\n"
             f"O^O/ {chr(92)}_/ {chr(92)}    Torch: {torch.__version__}. {gpu_stats_snippet} Triton: {triton_version}\n"
             f"{chr(92)}        /    Bfloat16 = {str(SUPPORTS_BFLOAT16).upper()}. FA [Xformers = {xformers_version}. FA2 = {HAS_FLASH_ATTENTION}]\n"
-            f' "-____-"     Free license: http://github.com/unslothai/bitsloth'
+            f' "-____-"     Free license: http://github.com/bitslothai/bitsloth'
         )
 
         print(statistics)
@@ -1340,7 +1340,7 @@ class FastBaseModel:
                 float32_mixed_precision = False
 
         # VLMs can hit DDP "marked ready twice" with re-entrant checkpointing.
-        # See: https://github.com/unslothai/bitsloth/issues/3713.
+        # See: https://github.com/bitslothai/bitsloth/issues/3713.
         use_reentrant = not is_distributed()
         if not use_reentrant:
             # Under DDP, avoid the offloaded/re-entrant checkpoint patch.

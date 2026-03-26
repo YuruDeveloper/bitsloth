@@ -538,12 +538,12 @@ def patch_ipykernel_hf_xet():
 
 def patch_trackio():
     # Set some environment variables to customize the Trackio dashboard for experiment tracking
-    # See https://github.com/unslothai/notebooks/pull/110
+    # See https://github.com/bitslothai/notebooks/pull/110
     os.environ["TRACKIO_LOGO_LIGHT_URL"] = (
-        "https://raw.githubusercontent.com/unslothai/bitsloth/main/images/bitsloth%20logo%20black%20text.png"
+        "https://raw.githubusercontent.com/bitslothai/bitsloth/main/images/bitsloth%20logo%20black%20text.png"
     )
     os.environ["TRACKIO_LOGO_DARK_URL"] = (
-        "https://raw.githubusercontent.com/unslothai/bitsloth/main/images/bitsloth%20logo%20white%20text.png"
+        "https://raw.githubusercontent.com/bitslothai/bitsloth/main/images/bitsloth%20logo%20white%20text.png"
     )
     os.environ["TRACKIO_PLOT_ORDER"] = "train/reward"
 
