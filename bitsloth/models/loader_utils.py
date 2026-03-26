@@ -40,11 +40,11 @@ LOCAL_RANK_KEYS = ("LOCAL_RANK", "RANK")
 WORLD_SIZE_KEYS = ("WORLD_SIZE",)
 
 BAD_MAPPINGS = {
-    bitsloth/Qwen3-32B-bitsloth-bnb-4bit".lower(): bitsloth/Qwen3-32B-bnb-4bit".lower(),  # 32B dynamic quant is way too big
-    bitsloth/Qwen3-30B-A3B-bitsloth-bnb-4bit".lower(): bitsloth/Qwen3-30B-A3B".lower(),  # HF loads MoEs too slowly
-    bitsloth/Qwen3-30B-A3B-bnb-4bit".lower(): bitsloth/Qwen3-30B-A3B".lower(),  # We rather do it on the fly
-    bitsloth/Qwen3-30B-A3B-Base-bitsloth-bnb-4bit".lower(): bitsloth/Qwen3-30B-A3B-Base".lower(),  # HF loads MoEs too slowly
-    bitsloth/Qwen3-30B-A3B-Base-bnb-4bit".lower(): bitsloth/Qwen3-30B-A3B-Base".lower(),  # We rather do it on the fly
+    "bitsloth/Qwen3-32B-bitsloth-bnb-4bit".lower(): "bitsloth/Qwen3-32B-bnb-4bit".lower(),  # 32B dynamic quant is way too big
+    "bitsloth/Qwen3-30B-A3B-bitsloth-bnb-4bit".lower(): "bitsloth/Qwen3-30B-A3B".lower(),  # HF loads MoEs too slowly
+    "bitsloth/Qwen3-30B-A3B-bnb-4bit".lower(): "bitsloth/Qwen3-30B-A3B".lower(),  # We rather do it on the fly
+    "bitsloth/Qwen3-30B-A3B-Base-bitsloth-bnb-4bit".lower(): "bitsloth/Qwen3-30B-A3B-Base".lower(),  # HF loads MoEs too slowly
+    "bitsloth/Qwen3-30B-A3B-Base-bnb-4bit".lower(): "bitsloth/Qwen3-30B-A3B-Base".lower(),  # We rather do it on the fly
 }
 
 
