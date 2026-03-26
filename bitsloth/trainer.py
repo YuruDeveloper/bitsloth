@@ -20,6 +20,7 @@ from dataclasses import dataclass, field
 from typing import Optional, List
 from functools import wraps
 
+import torch
 import trl
 import inspect
 from trl import SFTTrainer
@@ -47,6 +48,8 @@ __all__ = [
     "_patch_trl_trainer",
     "BitslothVisionDataCollator",
     "QGaloreConfig",
+    "BitNetConfig",
+    "TwoStageBitNetScheduler",
 ]
 
 logger = logging.getLogger(__name__)
@@ -132,6 +135,94 @@ except:
 
 
 @dataclass
+class BitNetConfig:
+    """Configuration for BitNet b1.58 + LoRA-Pre training.
+
+    Pass an instance of this class to ``BitslothTrainingArguments`` (via
+    ``bitnet_config``) to enable BitNet progressive conversion and training.
+    """
+
+    # 점진적 변환 대상
+    target: str = "ffn"  # "ffn", "attention", "router", "all"
+    # unsloth 4bit 모델용 래퍼 사용
+    use_4bit_wrapper: bool = True
+    # LoRA-Pre 옵티마이저 저랭크 비율
+    rank_ratio: float = 1 / 8
+    # 2단계 LR/WD 전략 (BitNet 논문 권장)
+    two_stage_lr: bool = True
+    peak_lr: float = 1.2e-3
+    end_lr: float = 8e-4
+    warmup_steps: int = 375
+    weight_decay_stage1: float = 0.1
+    # 점진적 변환 시 epoch 수 (변환 그룹당)
+    epochs_per_group: int = 1
+    # gradient clipping
+    grad_clip: float = 1.0
+
+
+class TwoStageBitNetScheduler:
+    """
+    BitNet b1.58 논문의 2단계 학습 전략 구현.
+
+    Stage 1 (0 ~ midpoint):  높은 peak LR, weight_decay=0.1
+    Stage 2 (midpoint ~ end): LR 선형 감소, weight_decay=0.0
+    """
+
+    def __init__(
+        self,
+        optimizer,
+        peak_lr: float,
+        end_lr: float,
+        total_steps: int,
+        warmup_steps: int = 375,
+        wd_stage1: float = 0.1,
+    ) -> None:
+        self.opt = optimizer
+        self.peak_lr = peak_lr
+        self.end_lr = end_lr
+        self.total_steps = total_steps
+        self.warmup_steps = warmup_steps
+        self.mid_steps = total_steps // 2
+        self.wd_stage1 = wd_stage1
+        self._step = 0
+
+    def step(self) -> None:
+        self._step += 1
+        t = self._step
+        ws = self.warmup_steps
+        ms = self.mid_steps
+        ts = self.total_steps
+
+        # LR 계산
+        if t <= ws:
+            # 웜업: 선형 증가
+            lr = self.peak_lr * (t / max(ws, 1))
+        elif t <= ms:
+            # Stage 1: peak LR 유지
+            lr = self.peak_lr
+        else:
+            # Stage 2: peak → end_lr 선형 감소
+            ratio = (t - ms) / max(ts - ms, 1)
+            lr = self.peak_lr + ratio * (self.end_lr - self.peak_lr)
+        lr = max(lr, self.end_lr)
+
+        # Weight Decay
+        wd = self.wd_stage1 if t <= ms else 0.0
+
+        # 옵티마이저 적용
+        for group in self.opt.param_groups:
+            group["lr"] = lr
+        if hasattr(self.opt, "set_weight_decay"):
+            self.opt.set_weight_decay(wd)
+
+    def state_dict(self) -> dict:
+        return {"step": self._step}
+
+    def load_state_dict(self, d: dict) -> None:
+        self._step = d["step"]
+
+
+@dataclass
 class QGaloreConfig:
     """Configuration for Q-GaLore optimizer integration.
 
@@ -159,10 +250,12 @@ class BitslothTrainingArguments(TrainingArguments):
         self,
         embedding_learning_rate: float = None,
         q_galore_config: Optional[QGaloreConfig] = None,
+        bitnet_config: Optional[BitNetConfig] = None,
         *args,
         **kwargs,
     ):
         self.q_galore_config = q_galore_config
+        self.bitnet_config = bitnet_config
         self.embedding_learning_rate = embedding_learning_rate
         super().__init__(*args, **kwargs)
         self.embedding_learning_rate = embedding_learning_rate
@@ -172,7 +265,7 @@ def _create_bitsloth_optimizer(
     model,
     optimizer_cls,
     optimizer_kwargs,
-    embedding_lr = 5e-5,
+    embedding_lr=5e-5,
 ):
     lr = optimizer_kwargs["lr"]
     weight_decay = optimizer_kwargs.get("weight_decay", 0.0)
@@ -213,6 +306,11 @@ def _create_bitsloth_optimizer(
 
 class BitslothTrainer(SFTTrainer):
     def create_optimizer(self):
+        # --- BitNet + LoRA-Pre optimizer ---
+        bitnet_config = getattr(self.args, "bitnet_config", None)
+        if bitnet_config is not None and self.optimizer is None:
+            return self._create_bitnet_optimizer(bitnet_config)
+
         # --- Q-GaLore optimizer ---
         q_galore_config = getattr(self.args, "q_galore_config", None)
         if q_galore_config is not None and self.optimizer is None:
@@ -236,7 +334,154 @@ class BitslothTrainer(SFTTrainer):
             )
         return self.optimizer
 
-    def _create_q_galore_optimizer(self, config: "QGaloreConfig", embedding_lr = None):
+    def _create_bitnet_optimizer(self, config: "BitNetConfig"):
+        """Build the LoRA-Pre optimizer for BitNet training."""
+        from bitsloth.optimizers.lora_pre import create_lora_pre_optimizer
+
+        lr = config.peak_lr
+        betas = (self.args.adam_beta1, self.args.adam_beta2)
+        eps = self.args.adam_epsilon
+
+        self.optimizer = create_lora_pre_optimizer(
+            self.model,
+            lr=lr,
+            betas=betas,
+            eps=eps,
+            weight_decay=config.weight_decay_stage1,
+            rank_ratio=config.rank_ratio,
+        )
+
+        print(
+            f"🦥 Bitsloth: BitNet + LoRA-Pre enabled — "
+            f"rank_ratio=1/{int(1 / config.rank_ratio)}, "
+            f"peak_lr={config.peak_lr:.2e} → {config.end_lr:.2e}"
+        )
+
+        return self.optimizer
+
+    def convert_to_bitnet(self, config: Optional[BitNetConfig] = None):
+        """
+        모델의 Linear 레이어를 BitNet으로 점진적 변환.
+
+        Args:
+            config: BitNet 설정. None이면 self.args.bitnet_config 사용
+        """
+        if config is None:
+            config = getattr(self.args, "bitnet_config", None)
+        if config is None:
+            raise ValueError("BitNetConfig가 설정되지 않았습니다.")
+
+        from bitsloth.models.bitnet import (
+            apply_bitnet_conversion,
+            BitNetLinear,
+            BitNetLinear4Bit,
+        )
+
+        if config.target == "all":
+            stats = apply_bitnet_conversion(
+                self.model,
+                target="all",
+                use_4bit_wrapper=config.use_4bit_wrapper,
+            )
+            return [stats]
+        else:
+            return self._progressive_convert_and_train(config)
+
+    def _register_bitnet_params(self, already_converted: set):
+        """변환된 BitNet 파라미터를 옵티마이저에 등록"""
+        from bitsloth.models.bitnet import BitNetLinear, BitNetLinear4Bit
+
+        if self.optimizer is None:
+            return
+
+        new_params = []
+        for name, mod in self.model.named_modules():
+            if name in already_converted:
+                continue
+            if isinstance(mod, (BitNetLinear, BitNetLinear4Bit)):
+                if hasattr(mod, "alpha") and isinstance(mod.alpha, torch.nn.Parameter):
+                    new_params.append(mod.alpha)
+                if hasattr(mod, "weight") and isinstance(
+                    mod.weight, torch.nn.Parameter
+                ):
+                    new_params.append(mod.weight)
+
+        if new_params:
+            self.optimizer.add_new_params(new_params)
+            print(f"  [BitNet] 옵티마이저에 {len(new_params)}개 파라미터 등록")
+
+    def _progressive_convert_and_train(self, config: BitNetConfig):
+        """
+        MoE 점진적 변환 + 학습 (FFN → Attention → Router)
+
+        각 단계마다:
+        1. 레이어 변환 (nn.Linear → BitNetLinear)
+        2. 옵티마이저에 새 파라미터 등록
+        3. 해당 레이어만 학습
+        4. gradient checkpointing 적용
+        """
+        from bitsloth.models.bitnet import (
+            CONVERSION_ORDER,
+            apply_bitnet_conversion,
+            BitNetLinear,
+            BitNetLinear4Bit,
+        )
+
+        all_stats = []
+        already_converted = set()
+
+        for step in CONVERSION_ORDER:
+            print(f"\n{'=' * 60}")
+            print(f"  [BitNet] 단계: {step.upper()} 변환 시작")
+            print(f"{'=' * 60}")
+
+            # 1) 변환
+            stats = apply_bitnet_conversion(
+                self.model,
+                target=step,
+                use_4bit_wrapper=config.use_4bit_wrapper,
+            )
+            all_stats.append({"step": step, **stats})
+
+            if stats["converted"] == 0:
+                print(f"  [skip] {step}: 대상 레이어 없음")
+                continue
+
+            # 2) 옵티마이저 생성 (처음 한 번만)
+            if self.optimizer is None:
+                from bitsloth.optimizers.lora_pre import create_lora_pre_optimizer
+
+                self.optimizer = create_lora_pre_optimizer(
+                    self.model,
+                    lr=config.peak_lr,
+                    betas=(self.args.adam_beta1, self.args.adam_beta2),
+                    eps=self.args.adam_epsilon,
+                    weight_decay=config.weight_decay_stage1,
+                    rank_ratio=config.rank_ratio,
+                )
+
+            # 3) 새 파라미터 등록
+            self._register_bitnet_params(already_converted)
+            already_converted |= set(
+                name
+                for name, mod in self.model.named_modules()
+                if isinstance(mod, (BitNetLinear, BitNetLinear4Bit))
+            )
+
+            # 4) gradient checkpointing
+            if hasattr(self.model, "gradient_checkpointing_enable"):
+                try:
+                    self.model.gradient_checkpointing_enable(
+                        gradient_checkpointing_kwargs={"use_reentrant": False}
+                    )
+                    print("  [✓] gradient checkpointing 활성화")
+                except Exception:
+                    pass
+
+        print("\n=== 점진적 변환 완료 ===")
+        return all_stats
+
+    def _create_q_galore_optimizer(self, config: "QGaloreConfig", embedding_lr=None):
         """Build the Q-GaLore optimizer from a QGaloreConfig."""
         from bitsloth.optimizers.q_galore_adamw import (
             QGaLoreAdamW8bit,
@@ -249,21 +494,21 @@ class BitslothTrainer(SFTTrainer):
 
         param_groups = make_q_galore_param_groups(
             self.model,
-            lr = lr,
-            weight_decay = weight_decay,
-            rank = config.rank,
-            update_proj_gap = config.update_proj_gap,
-            scale = config.scale,
-            proj_quant = config.proj_quant,
-            proj_quant_group_size = config.proj_quant_group_size,
-            proj_quant_n_bit = config.proj_quant_n_bit,
-            weight_quant = config.weight_quant,
-            stochastic_round = config.stochastic_round,
-            weight_group_size = config.weight_group_size,
-            cos_threshold = config.cos_threshold,
-            gamma_proj = config.gamma_proj,
-            queue_size = config.queue_size,
-            target_modules = config.target_modules,
+            lr=lr,
+            weight_decay=weight_decay,
+            rank=config.rank,
+            update_proj_gap=config.update_proj_gap,
+            scale=config.scale,
+            proj_quant=config.proj_quant,
+            proj_quant_group_size=config.proj_quant_group_size,
+            proj_quant_n_bit=config.proj_quant_n_bit,
+            weight_quant=config.weight_quant,
+            stochastic_round=config.stochastic_round,
+            weight_group_size=config.weight_group_size,
+            cos_threshold=config.cos_threshold,
+            gamma_proj=config.gamma_proj,
+            queue_size=config.queue_size,
+            target_modules=config.target_modules,
         )
 
         # --- Split embedding params with custom LR (Fix #2) ---
@@ -306,10 +551,10 @@ class BitslothTrainer(SFTTrainer):
         # --- Forward optimizer hyperparameters (Fix #3) ---
         self.optimizer = QGaLoreAdamW8bit(
             param_groups,
-            lr = lr,
-            weight_decay = weight_decay,
-            betas = (self.args.adam_beta1, self.args.adam_beta2),
-            eps = self.args.adam_epsilon,
+            lr=lr,
+            weight_decay=weight_decay,
+            betas=(self.args.adam_beta1, self.args.adam_beta2),
+            eps=self.args.adam_epsilon,
         )
 
         # Initialize INT8 weight quantization if enabled
@@ -317,8 +562,8 @@ class BitslothTrainer(SFTTrainer):
             QGaLoreAdamW8bit.init_weight_quantization(
                 self.model,
                 param_groups,
-                group_size = config.weight_group_size,
-                stochastic = config.stochastic_round,
+                group_size=config.weight_group_size,
+                stochastic=config.stochastic_round,
             )
             # Forward pre-hooks dequantize INT8 weights to float before each
             # forward pass, allowing the optimizer to free float weight memory
@@ -521,7 +766,7 @@ def _patch_sft_trainer_auto_packing(trl_module):
                 reason = "vision-language model"
             elif is_unsupported_model:
                 reason = f"unsupported model type(s): {', '.join(model_types)}"
-            message = "Bitsloth: Sample packing skipped " f"({reason} detected)."
+            message = f"Bitsloth: Sample packing skipped ({reason} detected)."
             print(message)
 
         packing_active = False

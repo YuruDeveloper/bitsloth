@@ -11,12 +11,11 @@ requires-python = ">=3.9,<3.15"
 license = "Apache-2.0"
 keywords = ["ai", "llm", "reinforcement learning", "machine learning", "artificial intelligence", "pytorch"]
 authors = [
-    {email = "info@bitsloth.ai"},
-    {name = "Bitsloth AI team"},
+    {email = "vkgkvk8@gmail.com"},
+    {name = "YuruDeveloper"},
 ]
 maintainers = [
-    {name = "Daniel Han", email = "daniel@bitsloth.ai"},
-    {name = "Michael Han", email = "info@bitsloth.ai"},
+    {name = "YuruDeveloper", email = "vkgkvk8@gmail.com"},
 ]
 classifiers = [
     "Programming Language :: Python",
