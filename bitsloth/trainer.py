@@ -32,14 +32,14 @@ from bitsloth.utils import (
     enable_sample_packing,
     get_gpu_count,
 )
-from unsloth_zoo.training_utils import (
+from bitsloth_zoo.training_utils import (
     bitsloth_train as _bitsloth_train,
 )
-from unsloth_zoo.vision_utils import (
+from bitsloth_zoo.vision_utils import (
     BitslothVisionDataCollator,
 )
-from unsloth_zoo.hf_utils import get_transformers_model_type
-from unsloth_zoo.utils import Version
+from bitsloth_zoo.hf_utils import get_transformers_model_type
+from bitsloth_zoo.utils import Version
 import dataclasses
 
 __all__ = [

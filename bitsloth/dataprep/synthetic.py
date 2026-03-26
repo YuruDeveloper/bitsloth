@@ -27,7 +27,7 @@ import torch
 import gc
 import time
 import re
-from unsloth_zoo.log import logger
+from bitsloth_zoo.log import logger
 import numpy as np
 
 from .synthetic_configs import (
@@ -36,7 +36,7 @@ from .synthetic_configs import (
 
 
 def _load_vllm_utils():
-    from unsloth_zoo.vllm_utils import (
+    from bitsloth_zoo.vllm_utils import (
         load_vllm,
         patch_vllm,
         delete_vllm,

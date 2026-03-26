@@ -42,13 +42,13 @@ from ..utils.attention_dispatch import (
 )
 from torch.nn.functional import scaled_dot_product_attention
 from transformers import __version__ as transformers_version
-from unsloth_zoo.utils import Version, _get_dtype
-from unsloth_zoo.hf_utils import (
+from bitsloth_zoo.utils import Version, _get_dtype
+from bitsloth_zoo.hf_utils import (
     dtype_from_config,
     add_dtype_kwargs,
     fix_lora_auto_mapping,
 )
-from unsloth_zoo.peft_utils import SKIP_QUANTIZATION_MODULES
+from bitsloth_zoo.peft_utils import SKIP_QUANTIZATION_MODULES
 from ..device_type import (
     is_hip,
     get_device_type,
@@ -2441,7 +2441,7 @@ class FastLlamaModel:
             model.fast_generate = make_fast_generate_wrapper(model.generate)
             model.fast_generate_batches = None
         else:
-            from unsloth_zoo.vllm_utils import (
+            from bitsloth_zoo.vllm_utils import (
                 load_vllm,
                 get_vllm_state_dict,
                 convert_vllm_to_huggingface,

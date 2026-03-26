@@ -62,9 +62,9 @@ from ..device_type import (
 )
 
 # https://github.com/huggingface/transformers/pull/26037 allows 4 bit loading!
-from unsloth_zoo.utils import Version, _get_dtype
-from unsloth_zoo.hf_utils import dtype_from_config
-from unsloth_zoo.tiled_mlp import patch_tiled_mlp
+from bitsloth_zoo.utils import Version, _get_dtype
+from bitsloth_zoo.hf_utils import dtype_from_config
+from bitsloth_zoo.tiled_mlp import patch_tiled_mlp
 
 transformers_version = Version(transformers_version)
 SUPPORTS_FOURBIT = transformers_version >= Version("4.37")
@@ -1142,7 +1142,7 @@ class FastModel(FastBaseModel):
                 "if name.endswith('norm'): "
                 "module._pre_set_compute_dtype = torch.float32\n"
                 ";"
-                "from unsloth_zoo.temporary_patches.gemma3n import patch_Gemma3nConv_Embed_forwards; patch_Gemma3nConv_Embed_forwards()"
+                "from bitsloth_zoo.temporary_patches.gemma3n import patch_Gemma3nConv_Embed_forwards; patch_Gemma3nConv_Embed_forwards()"
             )
             # Set norms to float32 since anyways they get upcasted to float32
             # common in both gemma-3 and gemma-3n

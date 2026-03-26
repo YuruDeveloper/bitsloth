@@ -27,12 +27,12 @@ import gc
 import subprocess
 import psutil
 
-from unsloth_zoo.tokenizer_utils import (
+from bitsloth_zoo.tokenizer_utils import (
     mean_of_trained_tokens,
     add_new_tokens,
     fix_untrained_tokens,
 )
-from unsloth_zoo.training_utils import (
+from bitsloth_zoo.training_utils import (
     fix_zero_training_loss,
 )
 
@@ -360,7 +360,7 @@ def fix_sentencepiece_tokenizer(
     except Exception as e:
         try:
             import google.protobuf
-            from unsloth_zoo.utils import Version
+            from bitsloth_zoo.utils import Version
 
             protobuf_version = Version(google.protobuf.__version__)
             if protobuf_version > Version("3.20.3"):

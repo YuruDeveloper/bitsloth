@@ -30,7 +30,7 @@ from .mapper import (
 # https://github.com/huggingface/transformers/pull/26037 allows 4 bit loading!
 from transformers import __version__ as transformers_version
 from bitsloth.models._utils import TorchAOConfig
-from unsloth_zoo.utils import Version
+from bitsloth_zoo.utils import Version
 import gc
 
 transformers_version = Version(transformers_version)
@@ -50,7 +50,7 @@ BAD_MAPPINGS = {
 
 def _get_torchao_fp8_config(fp8_mode):
     # Import lazily so an optional, broken vLLM install does not break plain `import bitsloth`.
-    from unsloth_zoo.vllm_utils import _get_torchao_fp8_config as _impl
+    from bitsloth_zoo.vllm_utils import _get_torchao_fp8_config as _impl
 
     return _impl(fp8_mode)
 
@@ -263,7 +263,7 @@ def get_model_name(
         if upgraded_model_name is not None:
             raise NotImplementedError(
                 f"Bitsloth: {model_name} is not supported in your current Bitsloth version! Please update Bitsloth via:\n\n"
-                "pip uninstall bitsloth unsloth_zoo -y\n"
+                "pip uninstall bitsloth bitsloth_zoo -y\n"
                 'pip install --upgrade --no-cache-dir "bitsloth[colab-new] @ git+https://github.com/unslothai/bitsloth.git"\n'
                 'pip install --upgrade --no-cache-dir "git+https://github.com/unslothai/bitsloth-zoo.git"\n'
             )
@@ -424,7 +424,7 @@ def _get_fp8_mode_and_check_settings(
         if Version(fbgemm_gpu.__version__) < Version("1.4.1"):
             # Old FBGEMM version - disable and use Triton kernels instead
             os.environ["BITSLOTH_HAS_FBGEMM"] = "0"
-            from unsloth_zoo.log import logger
+            from bitsloth_zoo.log import logger
 
             logger.info(
                 f"Bitsloth: fbgemm_gpu_genai=={fbgemm_gpu.__version__} is old for FP8 loading. "

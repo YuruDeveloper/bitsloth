@@ -34,7 +34,7 @@ from ._utils import *
 from .loader_utils import _get_fp8_mode_and_check_settings
 from ..save import patch_saving_functions
 from ..models.loader_utils import is_distributed
-from unsloth_zoo.gradient_checkpointing import (
+from bitsloth_zoo.gradient_checkpointing import (
     unpatch_bitsloth_gradient_checkpointing,
     unpatch_bitsloth_smart_gradient_checkpointing,
 )
@@ -43,7 +43,7 @@ import transformers.modeling_utils as hf_modeling_utils
 from peft import LoraConfig, TaskType, get_peft_model as _get_peft_model
 from peft import PeftModelForCausalLM
 from transformers import set_seed as transformers_set_seed
-from unsloth_zoo.peft_utils import (
+from bitsloth_zoo.peft_utils import (
     get_peft_regex,
     SKIP_QUANTIZATION_MODULES,
     requires_grad_for_gradient_checkpointing,
@@ -51,17 +51,17 @@ from unsloth_zoo.peft_utils import (
 from transformers.models.llama.modeling_llama import logger
 from transformers import __version__ as transformers_version
 from triton import __version__ as triton_version
-from unsloth_zoo.utils import _get_dtype
-from unsloth_zoo.hf_utils import (
+from bitsloth_zoo.utils import _get_dtype
+from bitsloth_zoo.hf_utils import (
     dtype_from_config,
     add_dtype_kwargs,
     fix_lora_auto_mapping,
     get_auto_processor,
 )
-from unsloth_zoo.patching_utils import patch_model_and_tokenizer
-from unsloth_zoo.training_utils import prepare_model_for_training
+from bitsloth_zoo.patching_utils import patch_model_and_tokenizer
+from bitsloth_zoo.training_utils import prepare_model_for_training
 
-from unsloth_zoo.utils import Version
+from bitsloth_zoo.utils import Version
 from transformers import __version__ as transformers_version
 
 import types
@@ -832,7 +832,7 @@ class FastBaseModel:
                     torch.cuda.empty_cache()
                     gc.collect()
         else:
-            from unsloth_zoo.vllm_utils import (
+            from bitsloth_zoo.vllm_utils import (
                 load_vllm,
                 get_vllm_state_dict,
                 convert_vllm_to_huggingface,

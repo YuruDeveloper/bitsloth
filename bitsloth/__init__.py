@@ -66,7 +66,7 @@ if already_imported:
         f"to ensure all optimizations are applied. Your code may run slower or encounter "
         f"memory issues without these optimizations.\n\n"
         f"Please restructure your imports with 'import bitsloth' at the top of your file.",
-        stacklevel = 2,
+        stacklevel=2,
     )
 del already_imported, critical_modules
 
@@ -86,26 +86,26 @@ os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 from importlib.metadata import version as importlib_version
 from importlib.metadata import PackageNotFoundError
 
-# Check for unsloth_zoo
+# Check for bitsloth_zoo
 try:
-    unsloth_zoo_version = importlib_version("unsloth_zoo")
-    if Version(unsloth_zoo_version) < Version("2026.3.4"):
+    bitsloth_zoo_version = importlib_version("bitsloth_zoo")
+    if Version(bitsloth_zoo_version) < Version("2026.3.4"):
         print(
             "Bitsloth: Please update Bitsloth and Bitsloth-Zoo to the latest version!\n"
-            "Do this via `pip install --upgrade --force-reinstall --no-cache-dir --no-deps bitsloth unsloth_zoo`"
+            "Do this via `pip install --upgrade --force-reinstall --no-cache-dir --no-deps bitsloth bitsloth_zoo`"
         )
         # if os.environ.get("BITSLOTH_DISABLE_AUTO_UPDATES", "0") == "0":
         #     try:
-        #         os.system("pip install --upgrade --no-cache-dir --no-deps unsloth_zoo")
+        #         os.system("pip install --upgrade --no-cache-dir --no-deps bitsloth_zoo")
         #     except:
         #         try:
-        #             os.system("pip install --upgrade --no-cache-dir --no-deps --user unsloth_zoo")
+        #             os.system("pip install --upgrade --no-cache-dir --no-deps --user bitsloth_zoo")
         #         except:
-        #             raise ImportError("Bitsloth: Please update unsloth_zoo via `pip install --upgrade --no-cache-dir --no-deps unsloth_zoo`")
-    import unsloth_zoo
+        #             raise ImportError("Bitsloth: Please update bitsloth_zoo via `pip install --upgrade --no-cache-dir --no-deps bitsloth_zoo`")
+    import bitsloth_zoo
 except PackageNotFoundError:
     raise ImportError(
-        f"Bitsloth: Please install unsloth_zoo via `pip install unsloth_zoo` then retry!"
+        f"Bitsloth: Please install bitsloth_zoo via `pip install bitsloth_zoo` then retry!"
     )
 except:
     raise
@@ -122,7 +122,7 @@ except ModuleNotFoundError:
 except:
     raise
 
-from unsloth_zoo.device_type import (
+from bitsloth_zoo.device_type import (
     is_hip,
     get_device_type,
     DEVICE_TYPE,
@@ -203,7 +203,7 @@ if DEVICE_TYPE == "cuda":
     old_is_bf16_supported = torch.cuda.is_bf16_supported
     if "including_emulation" in str(inspect.signature(old_is_bf16_supported)):
 
-        def is_bf16_supported(including_emulation = False):
+        def is_bf16_supported(including_emulation=False):
             return old_is_bf16_supported(including_emulation)
 
         torch.cuda.is_bf16_supported = is_bf16_supported
@@ -317,7 +317,7 @@ from .trainer import *
 
 # Export dataprep utilities for CLI and downstream users
 from .dataprep.raw_text import RawTextDataLoader, TextPreprocessor
-from unsloth_zoo.rl_environments import (
+from bitsloth_zoo.rl_environments import (
     check_python_modules,
     create_locked_down_function,
     execute_with_time_limit,

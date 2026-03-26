@@ -22,10 +22,10 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 import inspect
 import os
 import re
-from unsloth_zoo.compiler import create_new_function
-from unsloth_zoo.log import logger
-from unsloth_zoo.logging_utils import PatchRLStatistics
-from unsloth_zoo.rl_replacements import RL_REPLACEMENTS
+from bitsloth_zoo.compiler import create_new_function
+from bitsloth_zoo.log import logger
+from bitsloth_zoo.logging_utils import PatchRLStatistics
+from bitsloth_zoo.rl_replacements import RL_REPLACEMENTS
 from ..device_type import DEVICE_TYPE
 from .rl_replacements import (
     RL_EXTRA_ARGS,
@@ -60,7 +60,7 @@ except Exception:
 
 from trl import __version__ as trl_version_raw
 from importlib.metadata import version as importlib_version
-from unsloth_zoo.utils import Version
+from bitsloth_zoo.utils import Version
 
 try:
     trl_version = Version(trl_version_raw)
@@ -157,7 +157,7 @@ def PatchRL(FastLanguageModel):
 
             @_cm
             def unwrap_model_for_generation(
-                model, accelerator, gather_deepspeed3_params = True
+                model, accelerator, gather_deepspeed3_params=True
             ):
                 unwrapped_model = accelerator.unwrap_model(model)
                 is_gc = getattr(unwrapped_model, "is_gradient_checkpointing", False)
@@ -274,7 +274,7 @@ def PatchRL(FastLanguageModel):
             if has_labels or loss_without_labels:
                 with self.compute_loss_context_manager():
                     loss, outputs = self.compute_loss(
-                        model, inputs, return_outputs = True
+                        model, inputs, return_outputs=True
                     )
                 loss = loss.mean().detach()
 
@@ -289,9 +289,9 @@ def PatchRL(FastLanguageModel):
                 with self.compute_loss_context_manager():
                     tokenized_output = self.processing_class(
                         inputs["prompt"],
-                        padding = True,
-                        truncation = True,
-                        return_tensors = "pt",
+                        padding=True,
+                        truncation=True,
+                        return_tensors="pt",
                     ).to(model.device)
                     outputs = model(**tokenized_output)
                 if isinstance(outputs, dict):
@@ -354,13 +354,13 @@ from torch.nn import functional as F
 import inspect
 from transformers import DataCollatorForSeq2Seq, DataCollatorForLanguageModeling as TransformersDataCollatorForLanguageModeling
 from transformers.training_args import ParallelMode
-from unsloth_zoo.device_type import DEVICE_TYPE, device_synchronize
+from bitsloth_zoo.device_type import DEVICE_TYPE, device_synchronize
 
 # Wrap trainer with padding to right and enable training mode
 import functools
 from types import MethodType
 try:
-    from unsloth_zoo.gradient_checkpointing import reset_bitsloth_gradient_checkpointing_buffers
+    from bitsloth_zoo.gradient_checkpointing import reset_bitsloth_gradient_checkpointing_buffers
 except:
     def reset_bitsloth_gradient_checkpointing_buffers(): pass
 def prepare_for_training_mode(f):
@@ -528,7 +528,7 @@ def _wrap_grpo_generate_and_score(trainer_cls):
     trainer_cls._generate_and_score_completions = wrapped
 
 
-def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
+def _patch_trl_rl_trainers(trainer_file="grpo_trainer"):
     # Patch for vLLM and Bitsloth PEFT
     import trl
     import trl.trainer
@@ -788,7 +788,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
             "mixed_precision_dtype = os.environ.get('BITSLOTH_MIXED_PRECISION', 'float32')\n"
             "dtype = getattr(model.config, 'dtype', None) or getattr(model.config, 'torch_dtype', None)\n"
             "if dtype is None: dtype = model.get_input_embeddings().weight.dtype\n"
-            "from unsloth_zoo.utils import _get_dtype\n"
+            "from bitsloth_zoo.utils import _get_dtype\n"
             "dtype = _get_dtype(dtype)\n"
             "float16 = dtype == torch.float16\n"
             "if not force_float32 and (float16 and use_bf16): raise TypeError('Bitsloth: Model is in float16 precision but you want to use bfloat16 precision. Set fp16 to `True` and bf16 to `False`')\n"
@@ -838,7 +838,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
             "    from transformers import __version__ as transformers_version\n"
             "    if Version(transformers_version) <= Version('4.45.2'):\n"
             "        print('**** Bitsloth: Please use our fixed gradient_accumulation_steps by updating transformers, TRL and Bitsloth!\\n'\n"
-            "              '`pip install --upgrade --no-cache-dir --force-reinstall --no-deps bitsloth transformers trl unsloth_zoo`')\n"
+            "              '`pip install --upgrade --no-cache-dir --force-reinstall --no-deps bitsloth transformers trl bitsloth_zoo`')\n"
         )
         extra_args += check_ga
 
@@ -950,7 +950,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
     if "data_collator" in call_args and "train_dataset" in call_args:
         data_collator_check = (
             "__tokenizer = processing_class if 'processing_class' in locals() else tokenizer\n"
-            "from unsloth_zoo.vision_utils import BitslothVisionDataCollator\n"
+            "from bitsloth_zoo.vision_utils import BitslothVisionDataCollator\n"
             "if not isinstance(data_collator, BitslothVisionDataCollator):\n"
             "    if isinstance(data_collator, DataCollatorForSeq2Seq) and 'labels' not in train_dataset.column_names:\n"
             "        data_collator = TransformersDataCollatorForLanguageModeling(\n"
@@ -1051,7 +1051,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
     extra_args += (
         "other_metrics = []\n"
         f"{other_metrics_processor}\n"
-        "from unsloth_zoo.logging_utils import PatchRLStatistics\n"
+        "from bitsloth_zoo.logging_utils import PatchRLStatistics\n"
         f"PatchRLStatistics('{trainer_file}', other_metrics)\n"
     )
 
@@ -1200,9 +1200,9 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
     if "pad_to_multiple_of" in call_args:
         pad_to_multiple_of = (
             "if os.environ.get('BITSLOTH_ENABLE_FLEX_ATTENTION', '0') == '1':\n"
-            "    from unsloth_zoo.flex_attention import HAS_FLEX_ATTENTION\n"
+            "    from bitsloth_zoo.flex_attention import HAS_FLEX_ATTENTION\n"
             "    if HAS_FLEX_ATTENTION and pad_to_multiple_of is None:\n"
-            "        from unsloth_zoo.flex_attention import FLEX_ATTENTION_BLOCK_SIZE\n"
+            "        from bitsloth_zoo.flex_attention import FLEX_ATTENTION_BLOCK_SIZE\n"
             "        pad_to_multiple_of = FLEX_ATTENTION_BLOCK_SIZE\n"
             "\n"
         )
@@ -1347,33 +1347,33 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
     sanitize_logprob_code = inspect.getsource(sanitize_logprob)
     # Get final source code
     RLTrainer_source = RLTrainer_replacement.format(
-        RLTrainer_name = RLTrainer_name,
-        __RLTrainer_doc__ = __RLTrainer_doc__,
-        RLTrainer_arguments = RLTrainer_arguments,
-        RLTrainer_extra_args = RLTrainer_extra_args,
-        RLTrainer_call_args = RLTrainer_call_args,
-        RLTrainer_kwargs = ",**kwargs"[1 if RLTrainer_call_args.endswith(",") else 0 :],
-        RLConfig_name = RLConfig_name,
-        __RLConfig_doc__ = __RLConfig_doc__,
-        RLConfig_arguments = RLConfig_arguments,
-        RLConfig_extra_args = RLConfig_extra_args,
-        RLConfig_call_args = RLConfig_call_args,
-        RLConfig_kwargs = ",**kwargs"[1 if RLConfig_call_args.endswith(",") else 0 :],
-        RLConfig_post = RLConfig_post,
-        RLTrainer_extras = RLTrainer_extras,
-        RLTrainer_post = RLTrainer_post,
-        RL_pre = RL_pre,
-        max_seq_length_pre = max_seq_length_pre,
-        max_seq_length_call = max_seq_length_call,
-        max_seq_length_post = max_seq_length_post,
-        selective_log_softmax_code = selective_log_softmax_code,
-        grpo_selective_log_softmax_code = grpo_selective_log_softmax_code,
-        calculate_pad_tokens_in_prompt_code = calculate_pad_tokens_in_prompt_code,
-        create_completion_attention_mask_code = create_completion_attention_mask_code,
-        autotune_batch_and_chunks_code = autotune_batch_and_chunks_code,
-        left_pack_padding_code = left_pack_padding_code,
-        align_logprobs_with_mask_code = align_logprobs_with_mask_code,
-        sanitize_logprob_code = sanitize_logprob_code,
+        RLTrainer_name=RLTrainer_name,
+        __RLTrainer_doc__=__RLTrainer_doc__,
+        RLTrainer_arguments=RLTrainer_arguments,
+        RLTrainer_extra_args=RLTrainer_extra_args,
+        RLTrainer_call_args=RLTrainer_call_args,
+        RLTrainer_kwargs=",**kwargs"[1 if RLTrainer_call_args.endswith(",") else 0 :],
+        RLConfig_name=RLConfig_name,
+        __RLConfig_doc__=__RLConfig_doc__,
+        RLConfig_arguments=RLConfig_arguments,
+        RLConfig_extra_args=RLConfig_extra_args,
+        RLConfig_call_args=RLConfig_call_args,
+        RLConfig_kwargs=",**kwargs"[1 if RLConfig_call_args.endswith(",") else 0 :],
+        RLConfig_post=RLConfig_post,
+        RLTrainer_extras=RLTrainer_extras,
+        RLTrainer_post=RLTrainer_post,
+        RL_pre=RL_pre,
+        max_seq_length_pre=max_seq_length_pre,
+        max_seq_length_call=max_seq_length_call,
+        max_seq_length_post=max_seq_length_post,
+        selective_log_softmax_code=selective_log_softmax_code,
+        grpo_selective_log_softmax_code=grpo_selective_log_softmax_code,
+        calculate_pad_tokens_in_prompt_code=calculate_pad_tokens_in_prompt_code,
+        create_completion_attention_mask_code=create_completion_attention_mask_code,
+        autotune_batch_and_chunks_code=autotune_batch_and_chunks_code,
+        left_pack_padding_code=left_pack_padding_code,
+        align_logprobs_with_mask_code=align_logprobs_with_mask_code,
+        sanitize_logprob_code=sanitize_logprob_code,
     )
 
     if RLTrainer_name == "GRPOTrainer":
@@ -1410,7 +1410,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
         pattern = r"torch_compile_options\s*=\s*\{[^}]*\}"
 
         RLTrainer_source = re.sub(
-            pattern, new_options, RLTrainer_source, flags = re.DOTALL
+            pattern, new_options, RLTrainer_source, flags=re.DOTALL
         )
 
         if trl_version >= Version("0.27.0"):
@@ -1423,7 +1423,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
             replacement_comment = "\n        # PEFT initialization logic removed via script for trl >= 0.27.0\n"
 
             RLTrainer_source = re.sub(
-                peft_pattern, replacement_comment, RLTrainer_source, flags = re.DOTALL
+                peft_pattern, replacement_comment, RLTrainer_source, flags=re.DOTALL
             )
 
         elif trl_version >= Version("0.26.0"):
@@ -1437,7 +1437,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
                 peft_block_pattern,
                 "\n        # TRL PEFT 0.26.0 initialization logic removed on bitsloth side.\n",
                 RLTrainer_source,
-                flags = re.DOTALL,
+                flags=re.DOTALL,
             )
 
     # Remove TRL's unconditional bfloat16 cast of trainable params (added in
@@ -1505,7 +1505,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
         _prep_pattern = r"([ \t]*)train_dataset = self\._prepare_dataset\("
         _prep_replacement = r"\1self._bitsloth_model_ref = model\n\1train_dataset = self._prepare_dataset("
         RLTrainer_source = re.sub(
-            _prep_pattern, _prep_replacement, RLTrainer_source, count = 1
+            _prep_pattern, _prep_replacement, RLTrainer_source, count=1
         )
 
     # Silence TRL's noisy batch_size=1 + padding-free warning (handles both
@@ -1553,7 +1553,7 @@ def _patch_trl_rl_trainers(trainer_file = "grpo_trainer"):
         RLTrainer_source,
         _model_location,
         imports,
-        overwrite = False,
+        overwrite=False,
     )
     patched_trainer = getattr(created_module, f"Bitsloth{RLTrainer_name}")
     if trainer_file == "grpo_trainer":
@@ -1669,7 +1669,7 @@ def patch_functions(RLTrainer, trainer_file, RLTrainer_name, all_imports, import
                 commented_lines.append(line)
         return "\n".join(commented_lines)
 
-    init = re.sub(add_adapter_block_pattern, comment_out_block, init, flags = re.DOTALL)
+    init = re.sub(add_adapter_block_pattern, comment_out_block, init, flags=re.DOTALL)
 
     # Set use_vllm if not set
     if "args.use_vllm" in init and "model" in init and "args" in init:
@@ -1677,7 +1677,7 @@ def patch_functions(RLTrainer, trainer_file, RLTrainer_name, all_imports, import
         replacer = re.findall(
             r"def __init__\(.*?\).*?\:\n",
             init,
-            flags = re.MULTILINE | re.DOTALL,
+            flags=re.MULTILINE | re.DOTALL,
         )
         if len(replacer) != 0:
             replacer = replacer[0]
@@ -1712,24 +1712,24 @@ def patch_functions(RLTrainer, trainer_file, RLTrainer_name, all_imports, import
     vllm_part = re.findall(
         r"(\n[\s]{8}" r"if (self|args)\.use_vllm\:.*?" r"\n[\s]{8}" "else:\n)",
         init,
-        flags = re.MULTILINE | re.DOTALL,
+        flags=re.MULTILINE | re.DOTALL,
     )
 
     if len(vllm_part) == 1:
         vllm_part, args = vllm_part[0][0], vllm_part[0][1]
         # Strip all comments
         new_vllm_part = re.sub(
-            r"^\s*\#[^\n]*\n?", "", vllm_part, flags = re.MULTILINE
+            r"^\s*\#[^\n]*\n?", "", vllm_part, flags=re.MULTILINE
         )  # to also remove whole comment line instead of just starting at #
         new_vllm_part = re.sub(
-            r"\s*\#.*$", "", new_vllm_part, flags = re.MULTILINE
+            r"\s*\#.*$", "", new_vllm_part, flags=re.MULTILINE
         )  # remove comments that occur after code
 
         # Get SamplingParams
         sampling_params = re.findall(
             r"\n[\s]{4,}(self\.[^\s]{1,}[\s]{0,}\=[\s]{0,}" r"SamplingParams\(.+?\))",
             new_vllm_part,
-            flags = re.MULTILINE | re.DOTALL,
+            flags=re.MULTILINE | re.DOTALL,
         )
 
         if len(sampling_params) == 1:
@@ -1786,7 +1786,7 @@ def patch_functions(RLTrainer, trainer_file, RLTrainer_name, all_imports, import
                 vllm_llm_init_pattern,
                 vllm_llm_replacement,
                 new_vllm_part,
-                flags = re.DOTALL,  # Ensure . matches newlines [[5]]
+                flags=re.DOTALL,  # Ensure . matches newlines [[5]]
             )
 
         init = init.replace(vllm_part, new_vllm_part)
@@ -1940,7 +1940,9 @@ def patch_trl_rl_trainers():
 
 def patch_trl_openenv():
     for function in RL_ADDITIONAL_FUNCTIONS["openenv"]:
-        logger.info(f"Bitsloth: Patching trl openenv with function: {function.__name__}")
+        logger.info(
+            f"Bitsloth: Patching trl openenv with function: {function.__name__}"
+        )
         function()  # Call the function to apply the patch
     return
 
@@ -1969,7 +1971,7 @@ def patch_trl_vllm_generation():
     return
 
 
-def PatchFastRL(algorithm = None, FastLanguageModel = None):
+def PatchFastRL(algorithm=None, FastLanguageModel=None):
     if FastLanguageModel is not None:
         PatchRL(FastLanguageModel)
     patch_trl_rl_trainers()

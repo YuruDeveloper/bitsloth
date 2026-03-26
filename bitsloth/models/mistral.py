@@ -15,8 +15,8 @@
 from .llama import *
 import os
 from ._utils import __version__
-from unsloth_zoo.utils import _get_dtype
-from unsloth_zoo.hf_utils import dtype_from_config
+from bitsloth_zoo.utils import _get_dtype
+from bitsloth_zoo.hf_utils import dtype_from_config
 from ..utils.packing import (
     get_packed_info_from_kwargs,
     mask_packed_sequence_boundaries,
@@ -48,7 +48,7 @@ try:
 except:
     MistralSdpaAttention = MistralAttention
     MistralFlashAttention2 = MistralAttention
-from unsloth_zoo.utils import Version, _get_dtype
+from bitsloth_zoo.utils import Version, _get_dtype
 
 
 def MistralAttention_fast_forward(
