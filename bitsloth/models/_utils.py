@@ -751,6 +751,14 @@ except ImportError:
     except ImportError:
         auto_docstring = lambda cls: cls
 
+try:
+    from transformers.utils import strict
+except ImportError:
+    try:
+        from huggingface_hub import strict
+    except ImportError:
+        strict = lambda cls: cls
+
 from transformers import __version__ as transformers_version
 
 try:
