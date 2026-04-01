@@ -742,6 +742,15 @@ try:
     from transformers.modeling_rope_utils import RotaryEmbeddingConfigMixin
 except:
     pass
+
+try:
+    from transformers.utils import auto_docstring
+except ImportError:
+    try:
+        from transformers.modeling_utils import auto_docstring
+    except ImportError:
+        auto_docstring = lambda cls: cls
+
 from transformers import __version__ as transformers_version
 
 try:
